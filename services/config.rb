@@ -2,7 +2,6 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-old-ssl-policy.html"
-  display_name "ELB is using old SSL policy"
   description "Elastic Load Balancing (ELB) SSL policy is not the latest Amazon predefined SSL policy or is a custom ELB SSL policy."
   category "Security"
   suggested_action "Always use the current AWS predefined security policy."
