@@ -40,7 +40,7 @@ end
 ## This is part of tag parsing code.
 coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   action :run
-  data_type "html"
+  data_type "json"
   packages([
         {
           :name => "tableify",
