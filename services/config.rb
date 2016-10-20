@@ -20,22 +20,22 @@ coreo_aws_advisor_elb "advise-elb" do
 end
 
 ## This is the normal full notification of the primary recipient.
-coreo_uni_util_notify "advise-elb" do
-  action :notify
-  type 'email'
-  allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
-  send_on "${AUDIT_AWS_ELB_SEND_ON}"
-  payload '{"stack name":"INSTANCE::stack_name",
-  "instance name":"INSTANCE::name",
-  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
-  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
-  "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
-  "violations": STACK::coreo_aws_advisor_elb.advise-elb.report }'
-  payload_type "json"
-  endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
-  })
-end
+# coreo_uni_util_notify "advise-elb" do
+#   action :notify
+#   type 'email'
+#   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
+#   send_on "${AUDIT_AWS_ELB_SEND_ON}"
+#   payload '{"stack name":"INSTANCE::stack_name",
+#   "instance name":"INSTANCE::name",
+#   "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
+#   "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
+#   "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
+#   "violations": STACK::coreo_aws_advisor_elb.advise-elb.report }'
+#   payload_type "json"
+#   endpoint ({
+#       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
+#   })
+# end
 
 ## This is part of tag parsing code.
 coreo_uni_util_jsrunner "tags-to-notifiers-array" do
@@ -118,8 +118,8 @@ for (instance_id in violations) {
   tags_str = tags_str.replace(/, $/, "");
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
-      //var aalert = {};
-      //aalert[instance_id] = violations[instance_id];
+      var aalert = {};
+      aalert[instance_id] = violations[instance_id];
       region = violations[instance_id]["violations"]["elb-old-ssl-policy"]["region"];
       aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + instance_id + "";
       aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
@@ -132,7 +132,7 @@ for (instance_id in violations) {
       if (!payloads.hasOwnProperty(tagVal)) {
         payloads[tagVal] = [];
       }
-      payloads[tagVal].push(html);
+      payloads[tagVal].push(aalert);
     }
   }
 }
@@ -148,7 +148,7 @@ for (email in payloads) {
   notifier['payload'] = {};
   notifier['payload']['stack name'] = json_input['stack name'];
   notifier['payload']['instance name'] = json_input['instance name'];
-  //notifier['payload']['violations'] = '"' + payloads[email] + '"';
+  notifier['payload']['violations'] = payloads[email];
   notifiers.push(notifier);
 }
 callback(notifiers);
