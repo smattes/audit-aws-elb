@@ -143,7 +143,7 @@ for (email in payloads) {
   notifier['type'] = 'email';
   notifier['send_on'] = 'always';
   notifier['allow_empty'] = 'true';
-  notifier['payload_type'] = 'html';
+  notifier['payload_type'] = 'json';
   notifier['endpoint'] = endpoint;
   notifier['payload'] = {};
   notifier['payload']['stack name'] = json_input['stack name'];
