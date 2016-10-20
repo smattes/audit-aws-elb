@@ -40,6 +40,12 @@ end
 ## This is part of tag parsing code.
 coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   action :run
+  data_type "html"
+  packages([
+        {
+          :name => "tableify",
+          :version => "1.0.0"
+        }       ])
   json_input '{"stack name":"INSTANCE::stack_name",
   "instance name":"INSTANCE::name",
   "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
@@ -48,20 +54,84 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   "violations": STACK::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 console.log('we are running');
+var tableify = require('tableify');
+var style_section = "\
+<style>body {\
+font-family :arial;\
+padding : 0px;\
+margin : 0px;\
+}\
+\
+table {\
+font-size: 10pt;\
+border-top : black 1px solid;\
+border-right : black 1px solid;\
+/* border-spacing : 10px */\
+border-collapse : collapse;\
+}\
+\
+td, th {\
+text-align : left;\
+vertical-align : top;\
+white-space: nowrap;\
+overflow: hidden;\
+text-overflow: ellipsis;\
+border-left : black 1px solid;\
+border-bottom: black 1px solid;\
+padding-left : 4px;\
+padding-right : 4px;\
+}\
+\
+th {\
+background-color : #aaaaaa;\
+}\
+\
+td.number {\
+color : blue\
+}\
+\
+td.boolean {\
+color : green;\
+font-style : italic;\
+}\
+\
+td.date {\
+color : purple;\
+}\
+\
+td.null:after {\
+color : gray;\
+font-style : italic;\
+content : null;\
+}\
+</style>\
+";
 payloads = {};
 notifiers = [];
+ret_table = "[";
 violations=json_input['violations'];
 for (instance_id in violations) {
   tags = violations[instance_id]['tags'];
+  tags_str = tags.toString();
   for (var i = 0; i < tags.length; i++) {
+    inst_tags_string = inst_tags_string + tags[i]['key'] + ", ";
     if (tags[i]['key'] === 'bv:nexus:team') {
       var aalert = {};
       aalert[instance_id] = violations[instance_id];
+      aalert[tags_string] = tags_str;
+      region = violations[instance_id]["elb-old-ssl-policy"]["region"];
+      aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + instance_id + "";
+      aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
+      ret_table = ret_table + '{"ELB id" : "' + instance_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}, ';
+      ret_table = ret_table.replace(/, $/, "");
+      ret_table = ret_table + "]";
+      ret_obj = JSON.parse(ret_table);
+      html = tableify(ret_obj);
       tagVal = tags[i]['value'];
       if (!payloads.hasOwnProperty(tagVal)) {
         payloads[tagVal] = [];
       }
-      payloads[tagVal].push(aalert);
+      payloads[tagVal].push(html);
     }
   }
 }
@@ -72,11 +142,11 @@ for (email in payloads) {
   notifier['type'] = 'email';
   notifier['send_on'] = 'always';
   notifier['allow_empty'] = 'true';
-  notifier['payload_type'] = 'json';
+  notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
-  notifier['payload'] = {};
-  notifier['payload']['stack name'] = json_input['stack name'];
-  notifier['payload']['instance name'] = json_input['instance name'];
+  notifier['payload'] = "";
+  //notifier['payload']['stack name'] = json_input['stack name'];
+  //notifier['payload']['instance name'] = json_input['instance name'];
   notifier['payload']['violations'] = payloads[email];
   notifiers.push(notifier);
 }
@@ -92,6 +162,7 @@ end
 ## This is the summary report of how many alerts were sent to which emails.
 coreo_uni_util_jsrunner "tags-rollup" do
   action :run
+  data_type "text"
   json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
   function <<-EOH
 var rollup = [];
@@ -118,7 +189,7 @@ coreo_uni_util_notify "advise-elb-rollup" do
   "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
   "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
   "rollup report": STACK::coreo_uni_util_jsrunner.tags-rollup.return}'
-  payload_type 'json'
+  payload_type 'text'
   endpoint ({
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
   })
