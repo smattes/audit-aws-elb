@@ -119,7 +119,7 @@ for (instance_id in violations) {
     if (tags[i]['key'] === 'bv:nexus:team') {
       //var aalert = {};
       //aalert[instance_id] = violations[instance_id];
-      region = violations[instance_id]["elb-old-ssl-policy"]["region"];
+      region = violations[instance_id]["violations"]["elb-old-ssl-policy"]["region"];
       aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + instance_id + "";
       aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
       ret_table = ret_table + '{"ELB id" : "' + instance_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}, ';
