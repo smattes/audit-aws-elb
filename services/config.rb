@@ -46,7 +46,9 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
           :name => "tableify",
           :version => "1.0.0"
         }       ])
-  json_input 'STACK::coreo_aws_advisor_elb.advise-elb.report'
+  json_input '{"stack name":"INSTANCE::stack_name",
+                "instance name":"INSTANCE::name",
+                "violations": STACK::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 console.log('we are running');
 var tableify = require('tableify');
@@ -103,7 +105,7 @@ content : null;\
 ";
 payloads = {};
 notifiers = [];
-violations=json_input;
+violations=json_input["violations"];
 for (instance_id in violations) {
   ret_table = "[";
   inst_tags_string = "";
@@ -144,8 +146,8 @@ for (email in payloads) {
   notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
   notifier['payload'] = {};
-  //notifier['payload']['stack name'] = json_input['stack name'];
-  //notifier['payload']['instance name'] = json_input['instance name'];
+  notifier['payload']['stack name'] = json_input['stack name'];
+  notifier['payload']['instance name'] = json_input['instance name'];
   //notifier['payload']['violations'] = '"' + payloads[email] + '"';
   notifiers.push(notifier);
 }
@@ -158,8 +160,7 @@ end
    notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
  end
 
-#  "stack name":"INSTANCE::stack_name",
-#  "instance name":"INSTANCE::name",
+
 #  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
 #  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
 # "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
