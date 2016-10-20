@@ -132,7 +132,7 @@ for (instance_id in violations) {
       if (!payloads.hasOwnProperty(tagVal)) {
         payloads[tagVal] = [];
       }
-      payloads[tagVal].push(aalert);
+      payloads[tagVal].push(html);
     }
   }
 }
