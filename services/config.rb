@@ -167,7 +167,8 @@ end
 coreo_uni_util_jsrunner "tags-rollup" do
   action :run
   data_type "text"
-  json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+  #json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+  json_input 'STACK::coreo_aws_advisor_elb.advise-elb.report'
   function <<-EOH
 var rollup = [];
 for (var entry=0; entry < json_input.length; entry++) {
