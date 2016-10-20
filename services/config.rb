@@ -110,12 +110,12 @@ payloads = {};
 notifiers = [];
 ret_table = "[";
 inst_tags_string = "";
+tags_str = "";
 violations=json_input['violations'];
 for (instance_id in violations) {
   tags = violations[instance_id]['tags'];
-  tags_str = tags.toString();
+  tags_str = tags.toString().replace(/,/g, /, /);
   for (var i = 0; i < tags.length; i++) {
-    inst_tags_string = inst_tags_string + tags[i]['key'] + ", ";
     if (tags[i]['key'] === 'bv:nexus:team') {
       var aalert = {};
       aalert[instance_id] = violations[instance_id];
