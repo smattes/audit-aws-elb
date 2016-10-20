@@ -37,43 +37,6 @@ coreo_uni_util_notify "advise-elb" do
   })
 end
 
-
-## This is the summary report of how many alerts were sent to which emails.
-coreo_uni_util_jsrunner "tags-rollup" do
-  action :run
-  data_type "text"
-  json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
-  function <<-EOH
-var rollup = [];
-for (var entry=0; entry < json_input.length; entry++) {
-  console.log(json_input[entry]);
-  if (json_input[entry]['endpoint']['to'].length) {
-    console.log('got an email to rollup');
-    nViolations = json_input[entry]['payload']['violations'].length;
-    rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
-  }
-}
-callback(rollup);
-EOH
-end
-
-coreo_uni_util_notify "advise-elb-rollup" do
-  action :notify
-  type 'email'
-  allow_empty true
-  send_on 'always'
-  payload '"stack name":"INSTANCE::stack_name\\n",
-  "instance name":"INSTANCE::name\\n",
-  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks\\n",
-  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations\\n",
-  "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations\\n",
-  "rollup report": \\n\\n STACK::coreo_uni_util_jsrunner.tags-rollup.return'
-  payload_type 'text'
-  endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
-  })
-end
-
 ## This is part of tag parsing code.
 coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   action :run
@@ -195,8 +158,45 @@ callback(notifiers);
 EOH
 end
 
-coreo_uni_util_notify "advise-elb-to-tag-values" do
-  action :notify
-  notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+# coreo_uni_util_notify "advise-elb-to-tag-values" do
+#   action :notify
+#   notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+# end
+
+## This is the summary report of how many alerts were sent to which emails.
+coreo_uni_util_jsrunner "tags-rollup" do
+  action :run
+  data_type "text"
+  json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+  function <<-EOH
+var rollup = [];
+for (var entry=0; entry < json_input.length; entry++) {
+  console.log(json_input[entry]);
+  if (json_input[entry]['endpoint']['to'].length) {
+    console.log('got an email to rollup');
+    nViolations = json_input[entry]['payload']['violations'].length;
+    rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
+  }
+}
+callback(rollup);
+EOH
 end
+
+coreo_uni_util_notify "advise-elb-rollup" do
+  action :notify
+  type 'email'
+  allow_empty true
+  send_on 'always'
+  payload '"stack name":"INSTANCE::stack_name\\n",
+  "instance name":"INSTANCE::name\\n",
+  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks\\n",
+  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations\\n",
+  "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations\\n",
+  "rollup report": \\n\\n STACK::coreo_uni_util_jsrunner.tags-rollup.return'
+  payload_type 'text'
+  endpoint ({
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
+  })
+end
+
 
