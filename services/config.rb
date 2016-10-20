@@ -117,9 +117,8 @@ for (instance_id in violations) {
   tags_str = tags.toString().replace(/,/g, /, /);
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
-      var aalert = {};
-      aalert[instance_id] = violations[instance_id];
-      aalert[tags_string] = tags_str;
+      //var aalert = {};
+      //aalert[instance_id] = violations[instance_id];
       region = violations[instance_id]["elb-old-ssl-policy"]["region"];
       aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + instance_id + "";
       aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
