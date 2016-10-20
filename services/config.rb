@@ -144,9 +144,9 @@ for (email in payloads) {
   notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
   notifier['payload'] = {};
-  notifier['payload']['stack name'] = json_input['stack name'];
-  notifier['payload']['instance name'] = json_input['instance name'];
-  notifier['payload']['violations'] = '"' + payloads[email] + '"';
+  //notifier['payload']['stack name'] = json_input['stack name'];
+  //notifier['payload']['instance name'] = json_input['instance name'];
+  //notifier['payload']['violations'] = '"' + payloads[email] + '"';
   notifiers.push(notifier);
 }
 callback(notifiers);
