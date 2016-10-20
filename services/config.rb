@@ -109,6 +109,7 @@ content : null;\
 payloads = {};
 notifiers = [];
 ret_table = "[";
+inst_tags_string = "";
 violations=json_input['violations'];
 for (instance_id in violations) {
   tags = violations[instance_id]['tags'];
