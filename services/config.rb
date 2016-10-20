@@ -108,13 +108,17 @@ content : null;\
 ";
 payloads = {};
 notifiers = [];
-ret_table = "[";
-inst_tags_string = "";
-tags_str = "";
 violations=json_input['violations'];
 for (instance_id in violations) {
+  ret_table = "[";
+  inst_tags_string = "";
+  tags_str = "";
   tags = violations[instance_id]['tags'];
-  tags_str = tags.toString().replace(/,/g, /, /);
+  for (var i = 0; i < tags.length; i++) {
+    this_tag_key = tags[i]['key'];
+    tags_str = tags_str + this_tag_key + ", ";
+  }
+  tags_str = tags_str.replace(/, $/, "");
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
       //var aalert = {};
@@ -144,7 +148,7 @@ for (email in payloads) {
   notifier['allow_empty'] = 'true';
   notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
-  notifier['payload'] = "";
+  notifier['payload'] = {};
   //notifier['payload']['stack name'] = json_input['stack name'];
   //notifier['payload']['instance name'] = json_input['instance name'];
   notifier['payload']['violations'] = payloads[email];
