@@ -192,12 +192,14 @@ coreo_uni_util_notify "advise-elb-rollup" do
   type 'email'
   allow_empty true
   send_on 'always'
-  payload '"stack name":"INSTANCE::stack_name\\n",
-  "instance name":"INSTANCE::name\\n",
-  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks\\n",
-  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations\\n",
-  "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations\\n",
-  "rollup report": \\n\\n STACK::coreo_uni_util_jsrunner.tags-rollup.return'
+  payload '
+  stack name:                INSTANCE::stack_name\\n
+  instance name:             INSTANCE::name\\n
+  number_of_checks:          STACK::coreo_aws_advisor_elb.advise-elb.number_checks\\n
+  number_of_violations:      STACK::coreo_aws_advisor_elb.advise-elb.number_violations\\n
+  number_violations_ignored: STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations\\n
+  rollup report:\\n
+  STACK::coreo_uni_util_jsrunner.tags-rollup.return'
   payload_type 'text'
   endpoint ({
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
