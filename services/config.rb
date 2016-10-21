@@ -179,7 +179,7 @@ for (var entry=0; entry < json_input.length; entry++) {
   if (json_input[entry]['endpoint']['to'].length) {
     console.log('got an email to rollup');
     nViolations = json_input[entry]['payload']['violations'].length;
-    rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
+    //rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
     rollup_string = rollup_string + "recipient: " + json_input[entry]['endpoint']['to'] + " - " + "nViolations: " + nViolations + "\\n";
   }
 }
