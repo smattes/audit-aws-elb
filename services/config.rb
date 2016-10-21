@@ -174,13 +174,13 @@ coreo_uni_util_jsrunner "tags-rollup" do
   json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
   #json_input 'STACK::coreo_aws_advisor_elb.advise-elb.report'
   function <<-EOH
-var rollup = [];
+//var rollup = [];
 var rollup_string = "";
 for (var entry=0; entry < json_input.length; entry++) {
   console.log(json_input[entry]);
   if (json_input[entry]['endpoint']['to'].length) {
     console.log('got an email to rollup');
-    nViolations = json_input[entry]['payload']['violations'].length;
+    //nViolations = json_input[entry]['payload']['violations'].length;
     //rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
     rollup_string = rollup_string + "recipient: " + json_input[entry]['endpoint']['to'] + " - " + "nViolations: " + nViolations + "\\n";
   }
