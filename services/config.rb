@@ -138,37 +138,41 @@ stack_name = json_input["stack_name"];
 instance_name = json_input["instance_name"];
 for (elb_id in results) {
   ret_table = "";
-  inst_tags_string = "";
   tags_str = "";
-  tags = violations[elb_id]['tags'];
+  tags = results[elb_id]['tags'];
   for (var i = 0; i < tags.length; i++) {
     this_tag_key = tags[i]['key'];
     tags_str = tags_str + this_tag_key + ", ";
   }
   tags_str = tags_str.replace(/, $/, "");
+  found_owner_tag = false;
+  owner_tag_val = "RECIPIENT";
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
-      for (var j = 0; j <  violations[elb_id]["violations"].length; j++) {
-        this_rule_name = violations[elb_id]["violations"][j];
-        region = violations[elb_id]["violations"][this_rule_name]["region"];
-        aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
-        aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-        ret_table = ret_table + '{"ELB id" : "' + elb_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
-        //ret_table = ret_table.replace(/, $/, "");
-        tagVal = tags[i]['value'];
-        if (!payloads.hasOwnProperty(tagVal)) {
-          payloads[tagVal] = [];
-        }
-        payloads[tagVal][this_rule_name].push(ret_table);
-      }
+      found_owner_tag = true;
+      owner_tag_val = tags[i]['value'];
     }
   }
+
+  var violation_keys = Object.keys( results[elb_id]["violations"] );
+  for (var j = 0, length = violation_keys.length; j < length; j++) {
+    this_violation = results[elb_id]["violations"][violation_keys[j]];
+    this_rule_name = violation_keys[j];
+    region = this_violation["region"];
+    aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
+    aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
+    ret_table = "";
+    ret_table = ret_table + '{"ELB id" : "' + elb_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
+    if (!payloads.hasOwnProperty(owner_tag_val)) {
+      payloads[owner_tag_val] = {};
+    }
+    if (!payloads[owner_tag_val].hasOwnProperty(this_rule_name)) {
+      payloads[owner_tag_val][this_rule_name] = [];
+    }
+    payloads[owner_tag_val][this_rule_name].push(ret_table);
+  }
 }
-// tableify goes here
-//ret_table = ret_table + "]";
-//ret_obj = JSON.parse(ret_table);
-//html = tableify(ret_obj);
-//html = style_section + html;
+
 for (email in payloads) {
   var endpoint = {};
   endpoint['to'] = email;
@@ -179,9 +183,29 @@ for (email in payloads) {
   notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
   notifier['payload'] = "";
-  //notifier['payload']['stack name'] = json_input['stack name'];
-  //notifier['payload']['instance name'] = json_input['instance name'];
-  notifier['payload'] = payloads[email].toString();
+// tableify goes here
+//ret_table = ret_table + "]";
+//ret_obj = JSON.parse(ret_table);
+//html = tableify(ret_obj);
+//html = style_section + html;
+// notifier['payload']['stack name'] = json_input['stack name'];
+// notifier['payload']['instance name'] = json_input['instance name'];
+
+  html_obj = "";
+  var alert_rule_keys = Object.keys( payloads[email] );
+  for (var j = 0, length = alert_rule_keys.length; j < length; j++) {
+    this_rule_violations = payloads[email][alert_rule_keys[j]];
+    this_rule_name = alert_rule_keys[j];
+
+    table_obj = this_rule_violations.join();
+    table_obj = "[" + table_obj + "]";
+    table_json_obj = JSON.parse(table_obj);
+    this_html_obj = "<p>" + this_rule_name + "</p>" + tableify(table_json_obj);
+    html_obj = html_obj + this_html_obj;
+  }
+  html_obj = style_section + html_obj;
+
+  notifier['payload'] = html_obj;
   //console.log("gjm: " + notifier['payload']);
   notifiers.push(notifier);
 }
