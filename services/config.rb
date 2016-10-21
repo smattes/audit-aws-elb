@@ -1,3 +1,17 @@
+coreo_aws_advisor_alert "elb-inventory" do
+  action :define
+  service :elb
+  display_name "ELB Object Inventory"
+  description "This rule performs an inventory on all ELB's in the target AWS account."
+  category "Inventory"
+  suggested_action "None"
+  level "Information"
+  objectives ["load_balancers"]
+  audit_objects ["load_balancer_name"]
+  operators [""]
+  alert_when [/*/]
+end
+
 coreo_aws_advisor_alert "elb-old-ssl-policy" do
   action :define
   service :elb
@@ -11,6 +25,20 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
   operators ["!~"]
   alert_when [/ELBSecurityPolicy-2016-08/i]
+end
+
+coreo_aws_advisor_alert "elb-current-ssl-policy" do
+  action :define
+  service :elb
+  display_name "ELB is using current SSL policy"
+  description "Elastic Load Balancing (ELB) SSL policy is he latest Amazon predefined SSL policy"
+  category "Information"
+  suggested_action "None."
+  level "Information"
+  objectives ["load_balancers"]
+  audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
+  operators ["=="]
+  alert_when [/ELBSecurityPolicy-2016-08/]
 end
 
 coreo_aws_advisor_elb "advise-elb" do
