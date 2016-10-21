@@ -38,7 +38,7 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   objectives ["load_balancers"]
   audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
   operators ["=="]
-  alert_when [/ELBSecurityPolicy-2016-08/]
+  alert_when ["ELBSecurityPolicy-2016-08"]
 end
 
 coreo_aws_advisor_elb "advise-elb" do
