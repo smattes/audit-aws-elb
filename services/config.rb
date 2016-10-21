@@ -145,10 +145,11 @@ for (email in payloads) {
   notifier['allow_empty'] = 'true';
   notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
-  notifier['payload'] = {};
-  notifier['payload']['stack name'] = json_input['stack name'];
-  notifier['payload']['instance name'] = json_input['instance name'];
-  notifier['payload']['violations'] = payloads[email];
+  notifier['payload'] = "";
+  //notifier['payload']['stack name'] = json_input['stack name'];
+  //notifier['payload']['instance name'] = json_input['instance name'];
+  notifier['payload'] = payloads[email];
+  console.log(notifier['payload']);
   notifiers.push(notifier);
 }
 callback(notifiers);
