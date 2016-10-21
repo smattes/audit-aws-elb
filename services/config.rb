@@ -148,8 +148,8 @@ for (email in payloads) {
   notifier['payload'] = "";
   //notifier['payload']['stack name'] = json_input['stack name'];
   //notifier['payload']['instance name'] = json_input['instance name'];
-  notifier['payload'] = payloads[email];
-  console.log("gjm: " + notifier['payload']);
+  notifier['payload'] = payloads[email].toString();
+  //console.log("gjm: " + notifier['payload']);
   notifiers.push(notifier);
 }
 callback(notifiers);
