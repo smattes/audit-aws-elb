@@ -148,19 +148,18 @@ for (elb_id in results) {
   tags_str = tags_str.replace(/, $/, "");
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
-        for (var j = 0; j <  violations[elb_id]["violations"].length; j++) {
-          this_rule_name = violations[elb_id]["violations"][j];
-          region = violations[elb_id]["violations"][this_rule_name]["region"];
-          aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
-          aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-          ret_table = ret_table + '{"ELB id" : "' + elb_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
-          //ret_table = ret_table.replace(/, $/, "");
-          tagVal = tags[i]['value'];
-          if (!payloads.hasOwnProperty(tagVal)) {
-            payloads[tagVal] = [];
-          }
-          payloads[tagVal][this_rule_name].push(ret_table);
+      for (var j = 0; j <  violations[elb_id]["violations"].length; j++) {
+        this_rule_name = violations[elb_id]["violations"][j];
+        region = violations[elb_id]["violations"][this_rule_name]["region"];
+        aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
+        aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
+        ret_table = ret_table + '{"ELB id" : "' + elb_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
+        //ret_table = ret_table.replace(/, $/, "");
+        tagVal = tags[i]['value'];
+        if (!payloads.hasOwnProperty(tagVal)) {
+          payloads[tagVal] = [];
         }
+        payloads[tagVal][this_rule_name].push(ret_table);
       }
     }
   }
