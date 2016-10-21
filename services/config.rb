@@ -128,6 +128,7 @@ for (instance_id in violations) {
       ret_table = ret_table + "]";
       ret_obj = JSON.parse(ret_table);
       html = tableify(ret_obj);
+      html = style_section + html;
       tagVal = tags[i]['value'];
       if (!payloads.hasOwnProperty(tagVal)) {
         payloads[tagVal] = [];
