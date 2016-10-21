@@ -74,8 +74,8 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
           :name => "tableify",
           :version => "1.0.0"
         }       ])
-  json_input '{"stack name":"INSTANCE::stack_name",
-                "instance name":"INSTANCE::name",
+  json_input '{"stack_name":"INSTANCE::stack_name",
+                "instance_name":"INSTANCE::name",
                 "violations": STACK::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 console.log('we are running');
@@ -133,12 +133,14 @@ content : null;\
 ";
 payloads = {};
 notifiers = [];
-violations=json_input["violations"];
-for (instance_id in violations) {
+results = json_input["violations"];
+stack_name = json_input["stack_name"];
+instance_name = json_input["instance_name"];
+for (elb_id in results) {
   ret_table = "";
   inst_tags_string = "";
   tags_str = "";
-  tags = violations[instance_id]['tags'];
+  tags = violations[elb_id]['tags'];
   for (var i = 0; i < tags.length; i++) {
     this_tag_key = tags[i]['key'];
     tags_str = tags_str + this_tag_key + ", ";
@@ -146,18 +148,20 @@ for (instance_id in violations) {
   tags_str = tags_str.replace(/, $/, "");
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
-      //var aalert = {};
-      //aalert[instance_id] = violations[instance_id];
-      //region = violations[instance_id]["violations"]["elb-old-ssl-policy"]["region"];
-      aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + instance_id + "";
-      aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-      ret_table = ret_table + '{"ELB id" : "' + instance_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
-      //ret_table = ret_table.replace(/, $/, "");
-      tagVal = tags[i]['value'];
-      if (!payloads.hasOwnProperty(tagVal)) {
-        payloads[tagVal] = [];
+        for (var j = 0; j <  violations[elb_id]["violations"].length; j++) {
+          this_rule_name = violations[elb_id]["violations"][j];
+          region = violations[elb_id]["violations"][this_rule_name]["region"];
+          aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
+          aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
+          ret_table = ret_table + '{"ELB id" : "' + elb_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
+          //ret_table = ret_table.replace(/, $/, "");
+          tagVal = tags[i]['value'];
+          if (!payloads.hasOwnProperty(tagVal)) {
+            payloads[tagVal] = [];
+          }
+          payloads[tagVal][this_rule_name].push(ret_table);
+        }
       }
-      payloads[tagVal].push(ret_table);
     }
   }
 }
