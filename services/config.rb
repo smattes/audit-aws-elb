@@ -8,8 +8,8 @@ coreo_aws_advisor_alert "elb-inventory" do
   level "Information"
   objectives ["load_balancers"]
   audit_objects ["load_balancer_descriptions.load_balancer_name"]
-  operators ["!="]
-  #alert_when [""]
+  operators ["=~"]
+  alert_when [/\*/]
 end
 
 coreo_aws_advisor_alert "elb-old-ssl-policy" do
