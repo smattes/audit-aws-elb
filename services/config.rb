@@ -135,7 +135,7 @@ payloads = {};
 notifiers = [];
 violations=json_input["violations"];
 for (instance_id in violations) {
-  ret_table = "[";
+  ret_table = "";
   inst_tags_string = "";
   tags_str = "";
   tags = violations[instance_id]['tags'];
@@ -146,25 +146,26 @@ for (instance_id in violations) {
   tags_str = tags_str.replace(/, $/, "");
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
-      var aalert = {};
-      aalert[instance_id] = violations[instance_id];
-      region = violations[instance_id]["violations"]["elb-old-ssl-policy"]["region"];
+      //var aalert = {};
+      //aalert[instance_id] = violations[instance_id];
+      //region = violations[instance_id]["violations"]["elb-old-ssl-policy"]["region"];
       aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + instance_id + "";
       aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-      ret_table = ret_table + '{"ELB id" : "' + instance_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}, ';
-      ret_table = ret_table.replace(/, $/, "");
-      ret_table = ret_table + "]";
-      ret_obj = JSON.parse(ret_table);
-      html = tableify(ret_obj);
-      html = style_section + html;
+      ret_table = ret_table + '{"ELB id" : "' + instance_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
+      //ret_table = ret_table.replace(/, $/, "");
       tagVal = tags[i]['value'];
       if (!payloads.hasOwnProperty(tagVal)) {
         payloads[tagVal] = [];
       }
-      payloads[tagVal].push(html);
+      payloads[tagVal].push(ret_table);
     }
   }
 }
+// tableify goes here
+//ret_table = ret_table + "]";
+//ret_obj = JSON.parse(ret_table);
+//html = tableify(ret_obj);
+//html = style_section + html;
 for (email in payloads) {
   var endpoint = {};
   endpoint['to'] = email;
