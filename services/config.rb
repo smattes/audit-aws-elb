@@ -174,6 +174,7 @@ for (elb_id in results) {
 }
 
 for (email in payloads) {
+  nviolations = 0;
   var endpoint = {};
   endpoint['to'] = email;
   var notifier = {};
@@ -183,6 +184,7 @@ for (email in payloads) {
   notifier['payload_type'] = 'html';
   notifier['endpoint'] = endpoint;
   notifier['payload'] = "";
+  notifier['num_violations'] = "";
 // tableify goes here
 //ret_table = ret_table + "]";
 //ret_obj = JSON.parse(ret_table);
@@ -202,10 +204,12 @@ for (email in payloads) {
     table_json_obj = JSON.parse(table_obj);
     this_html_obj = "<p>" + this_rule_name + "</p>" + tableify(table_json_obj);
     html_obj = html_obj + this_html_obj;
+    nviolations++;
   }
   html_obj = style_section + html_obj;
 
   notifier['payload'] = html_obj;
+  notifier['num_violations'] = nviolations.toString();
   //console.log("gjm: " + notifier['payload']);
   notifiers.push(notifier);
 }
@@ -213,27 +217,28 @@ callback(notifiers);
 EOH
 end
 
-coreo_uni_util_notify "advise-jsrunner-file" do
-  action :notify
-  type 'email'
-  allow_empty true
-  payload_type "text"
-  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
-  endpoint ({
-      :to => 'george@cloudcoreo.com', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
-  })
-end
- 
-coreo_uni_util_notify "advise-package" do
-  action :notify
-  type 'email'
-  allow_empty true
-  payload_type "json"
-  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
-  endpoint ({
-      :to => 'george@cloudcoreo.com', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
-  })
-end
+# these two jsrunners are for debug purposes only - they send the internal files to you for debugging
+#
+# coreo_uni_util_notify "advise-jsrunner-file" do
+#   action :notify
+#   type 'email'
+#   allow_empty true
+#   payload_type "text"
+#   payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
+#   endpoint ({
+#       :to => 'george@cloudcoreo.com', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
+#   })
+# end
+# coreo_uni_util_notify "advise-package" do
+#   action :notify
+#   type 'email'
+#   allow_empty true
+#   payload_type "json"
+#   payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
+#   endpoint ({
+#       :to => 'george@cloudcoreo.com', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
+#   })
+# end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :notify
@@ -260,7 +265,7 @@ for (var entry=0; entry < json_input.length; entry++) {
     console.log('got an email to rollup');
     //nViolations = json_input[entry]['payload']['violations'].length;
     //rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
-    rollup_string = rollup_string + "recipient: " + json_input[entry]['endpoint']['to'] + " - " + "nViolations: " + "\\n";
+    rollup_string = rollup_string + "recipient: " + json_input[entry]['endpoint']['to'] + " - " + "nViolations: " + json_input[entry]['num_violations'] + "\\n";
   }
 }
 callback(rollup_string);
