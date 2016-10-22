@@ -146,7 +146,7 @@ for (elb_id in results) {
   }
   tags_str = tags_str.replace(/, $/, "");
   found_owner_tag = false;
-  owner_tag_val = "RECIPIENT";
+  owner_tag_val = "${AUDIT_AWS_ELB_ALERT_RECIPIENT}";
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === 'bv:nexus:team') {
       found_owner_tag = true;
@@ -213,10 +213,32 @@ callback(notifiers);
 EOH
 end
 
- coreo_uni_util_notify "advise-elb-to-tag-values" do
-   action :notify
-   notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
- end
+coreo_uni_util_notify "advise-jsrunner-file" do
+  action :notify
+  type 'email'
+  allow_empty true
+  payload_type "text"
+  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
+  endpoint ({
+      :to => 'george@cloudcoreo.com', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
+  })
+end
+ 
+coreo_uni_util_notify "advise-package" do
+  action :notify
+  type 'email'
+  allow_empty true
+  payload_type "json"
+  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
+  endpoint ({
+      :to => 'george@cloudcoreo.com', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
+  })
+end
+
+coreo_uni_util_notify "advise-elb-to-tag-values" do
+  action :notify
+  notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
+end
 
 
 #  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
