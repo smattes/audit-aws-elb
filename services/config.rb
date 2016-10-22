@@ -198,13 +198,12 @@ for (email in payloads) {
   for (var j = 0, length = alert_rule_keys.length; j < length; j++) {
     this_rule_violations = payloads[email][alert_rule_keys[j]];
     this_rule_name = alert_rule_keys[j];
-
+    nviolations = nviolations + this_rule_violations.length;
     table_obj = this_rule_violations.join();
     table_obj = "[" + table_obj + "]";
     table_json_obj = JSON.parse(table_obj);
     this_html_obj = "<p>" + this_rule_name + "</p>" + tableify(table_json_obj);
     html_obj = html_obj + this_html_obj;
-    nviolations++;
   }
   html_obj = style_section + html_obj;
 
