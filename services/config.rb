@@ -219,26 +219,26 @@ end
 
 # these two jsrunners are for debug purposes only - they send the internal files to you for debugging
 #
-# coreo_uni_util_notify "advise-jsrunner-file" do
-#   action :notify
-#   type 'email'
-#   allow_empty true
-#   payload_type "text"
-#   payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
-#   endpoint ({
-#       :to => 'george@cloudcoreo.com', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
-#   })
-# end
-# coreo_uni_util_notify "advise-package" do
-#   action :notify
-#   type 'email'
-#   allow_empty true
-#   payload_type "json"
-#   payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
-#   endpoint ({
-#       :to => 'george@cloudcoreo.com', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
-#   })
-# end
+coreo_uni_util_notify "advise-jsrunner-file" do
+  action :notify
+  type 'email'
+  allow_empty true
+  payload_type "text"
+  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
+  endpoint ({
+      :to => 'george@cloudcoreo.com', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
+  })
+end
+coreo_uni_util_notify "advise-package" do
+  action :notify
+  type 'email'
+  allow_empty true
+  payload_type "json"
+  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
+  endpoint ({
+      :to => 'george@cloudcoreo.com', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
+  })
+end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :notify
