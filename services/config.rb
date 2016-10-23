@@ -161,12 +161,6 @@ for (elb_id in results) {
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
     region = this_violation["region"];
-    category = "";
-    description = "";
-    display_name = "";
-    level = "";
-    kb_link = "";
-    action = "";
     category = this_violation["category"];
     description = this_violation["description"];
     display_name = this_violation["display_name"];
@@ -182,11 +176,11 @@ for (elb_id in results) {
         '"aws link" : "' + aws_console_html + '", ' +
         '"aws tags" : "' + tags_str + '"' +
         '}';
-    if (kb_link.includes("kb.cloudcoreo.com")) {
-      kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
-    } else {
-        kb_html = "";
-    }
+//    if (kb_link.includes("kb.cloudcoreo.com")) {
+//      kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
+//    } else {
+//        kb_html = "";
+//    }
     ret_metadata =
         '{' +
         '"display name" : "' + display_name + '", ' +
