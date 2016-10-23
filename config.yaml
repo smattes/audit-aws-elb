@@ -6,7 +6,6 @@ variables:
     default:
       - elb-old-ssl-policy
       - elb-inventory
-#      - elb-current-ssl-policy
   AUDIT_AWS_ELB_ALERT_RECIPIENT:
     description: email recipient for notification
     required: true
