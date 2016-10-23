@@ -159,17 +159,42 @@ for (elb_id in results) {
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
     region = this_violation["region"];
+    category = this_violation["category"];
+    description = this_violation["description"];
+    display_name = this_violation["display_name"];
+    level = this_violation["level"];
+    kb_link = this_violation["link"];
+    action = this_violation["suggested_action"];
     aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
     aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-    ret_table = "";
-    ret_table = ret_table + '{"ELB id" : "' + elb_id + '", "region" : "' + region + '", "aws link" : "' + aws_console_html + '","aws tags" : "' + tags_str + '"}';
+    ret_table =
+        '{' +
+        '"ELB id" : "' + elb_id + '", ' +
+        '"region" : "' + region + '", ' +
+        '"aws link" : "' + aws_console_html + '", ' +
+        '"aws tags" : "' + tags_str + '"' +
+        '}';
+    kb_html = kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
+    ret_metadata =
+        '{' +
+        '"display name" : "' + display_name + '", ' +
+        '"rule id" : "' + this_rule_name + '", ' +
+        '"category" : "' + category + '", ' +
+        '"kb link" : "' + kb_html + '", ' +
+        '"suggested action" : "' + action + '", ' +
+        '"level" : "' + level + '", ' +
+        '"description" : "' + description + '"' +
+        '}';
     if (!payloads.hasOwnProperty(owner_tag_val)) {
       payloads[owner_tag_val] = {};
     }
     if (!payloads[owner_tag_val].hasOwnProperty(this_rule_name)) {
-      payloads[owner_tag_val][this_rule_name] = [];
+      payloads[owner_tag_val][this_rule_name] = {};
+      payloads[owner_tag_val][this_rule_name]["metadata"] = [];
+      payloads[owner_tag_val][this_rule_name]["objects"] = [];
     }
-    payloads[owner_tag_val][this_rule_name].push(ret_table);
+    payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
+    payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
   }
 }
 
@@ -187,26 +212,32 @@ for (email in payloads) {
   notifier['num_violations'] = "";
 
   html_obj = "";
-  var alert_rule_keys = Object.keys( payloads[email] );
+  var alert_rule_keys = Object.getOwnPropertyNames( payloads[email] );
   for (var j = 0, length = alert_rule_keys.length; j < length; j++) {
-    this_rule_violations = payloads[email][alert_rule_keys[j]];
+    this_rule_violations = payloads[email][alert_rule_keys[j]]["objects"];
+    this_rule_metadata = payloads[email][alert_rule_keys[j]]["metadata"];
+
     this_rule_name = alert_rule_keys[j];
     nviolations = nviolations + this_rule_violations.length;
+
     table_obj = this_rule_violations.join();
     table_obj = "[" + table_obj + "]";
     table_json_obj = JSON.parse(table_obj);
-    this_html_obj = "<p>" + this_rule_name + "</p>" + tableify(table_json_obj);
-    html_obj = html_obj + this_html_obj;
+    this_html_obj = tableify(table_json_obj);
+
+    table_obj_metadata = this_rule_metadata.join();
+    table_obj_metadata = "[" + table_obj_metadata + "]";
+    table_json_metadata_obj = JSON.parse(table_obj_metadata);
+    this_html_metadata_obj = tableify(table_json_metadata_obj);
+
+    html_obj = html_obj + this_html_metadata_obj + this_html_obj;
   }
   html_obj = style_section + html_obj;
 
   notifier['payload'] = html_obj;
   notifier['num_violations'] = nviolations.toString();
 
-  if (email != "NO_OWNER") {
-    notifiers.push(notifier);
-  }
-
+  notifiers.push(notifier);
 }
 callback(notifiers);
 EOH
@@ -221,7 +252,7 @@ coreo_uni_util_notify "advise-jsrunner-file" do
   payload_type "text"
   payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
   endpoint ({
-      :to => 'george@cloudcoreo.com', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
   })
 end
 coreo_uni_util_notify "advise-package" do
@@ -231,7 +262,7 @@ coreo_uni_util_notify "advise-package" do
   payload_type "json"
   payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
   endpoint ({
-      :to => 'george@cloudcoreo.com', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
   })
 end
 
@@ -244,7 +275,6 @@ coreo_uni_util_jsrunner "tags-rollup" do
   action :run
   data_type "text"
   json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
-  #json_input 'STACK::coreo_aws_advisor_elb.advise-elb.report'
   function <<-EOH
 //var rollup = [];
 var rollup_string = "";
