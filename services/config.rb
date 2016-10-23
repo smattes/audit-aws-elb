@@ -78,7 +78,6 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                 "instance_name":"INSTANCE::name",
                 "violations": STACK::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
-//console.log('we are running');
 var tableify = require('tableify');
 var style_section = "\
 <style>body {\
@@ -155,6 +154,7 @@ for (elb_id in results) {
   }
 
   var violation_keys = Object.keys( results[elb_id]["violations"] );
+  pushed_metadata = false;
   for (var j = 0, length = violation_keys.length; j < length; j++) {
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
@@ -193,7 +193,10 @@ for (elb_id in results) {
       payloads[owner_tag_val][this_rule_name]["metadata"] = [];
       payloads[owner_tag_val][this_rule_name]["objects"] = [];
     }
-    payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
+    if (pushed_metadata == false) {
+      payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
+      pushed_metadata = true;
+    }
     payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
   }
 }
@@ -230,7 +233,7 @@ for (email in payloads) {
     table_json_metadata_obj = JSON.parse(table_obj_metadata);
     this_html_metadata_obj = tableify(table_json_metadata_obj);
 
-    html_obj = html_obj + this_html_metadata_obj + this_html_obj;
+    html_obj = html_obj + this_html_metadata_obj + this_html_obj + </br>;
   }
   html_obj = style_section + html_obj;
 
