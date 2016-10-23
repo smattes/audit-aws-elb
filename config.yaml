@@ -5,8 +5,6 @@ variables:
     type: array
     default:
       - elb-old-ssl-policy
-      - elb-inventory
-      - elb-current-ssl-policy
   AUDIT_AWS_ELB_ALERT_RECIPIENT:
     description: email recipient for notification
     required: true
@@ -14,7 +12,7 @@ variables:
     default:
   AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT:
     description: email recipient for objects with no owner tag if owner tag is enabled
-    required: true
+    required: false
     type: string
     default:
   AUDIT_AWS_ELB_ALLOW_EMPTY:
@@ -31,7 +29,7 @@ variables:
     description: AWS tag whose value is an email address specifying the owner of the ELB object
     required: false
     type: string
-    default: "OWNER"
+    default: "NOT_A_TAG"
   AUDIT_AWS_ELB_FULL_JSON_REPORT:
     description: notify or nothing
     required: true
@@ -41,23 +39,24 @@ variables:
     description: notify or nothing
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_ROLLUP_REPORT:
     description: notify or nothing
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_DEBUG_REPORT:
     description: notify or nothing
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_REGIONS:
     description: list of AWS regions to check. Default is all regions
     required: true
     type: array
     default:
         - us-east-1
+
 #        - us-west-1
 #        - us-west-2
 #       - ap-south-1
@@ -68,3 +67,6 @@ variables:
 #       - eu-central-1
 #       - eu-west-1
 #       - sa-east-1
+
+#      - elb-inventory
+#      - elb-current-ssl-policy

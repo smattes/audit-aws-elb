@@ -182,10 +182,10 @@ for (elb_id in results) {
         '"aws link" : "' + aws_console_html + '", ' +
         '"aws tags" : "' + tags_str + '"' +
         '}';
-    if (kb_link == "") {
-      kb_html = "";
+    if (kb_link.includes("kb.cloudcoreo.com")) {
+      kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
     } else {
-        kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
+        kb_html = "";
     }
     ret_metadata =
         '{' +
