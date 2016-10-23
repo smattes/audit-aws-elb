@@ -36,22 +36,22 @@ variables:
     description: 'notify' or 'nothing'
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_OWNERS_HTML_REPORT:
     description: 'notify' or 'nothing'
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_ROLLUP_REPORT:
     description: 'notify' or 'nothing'
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_DEBUG_REPORT:
     description: 'notify' or 'nothing'
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_REGIONS:
     description: list of AWS regions to check. Default is all regions
     required: true
