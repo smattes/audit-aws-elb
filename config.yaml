@@ -5,7 +5,6 @@ variables:
     type: array
     default:
       - elb-old-ssl-policy
-      - elb-inventory
   AUDIT_AWS_ELB_ALERT_RECIPIENT:
     description: email recipient for notification
     required: true
@@ -27,27 +26,27 @@ variables:
     type: string
     default: "OWNER"
   AUDIT_AWS_ELB_FULL_JSON_REPORT:
-    description: 'notify' or 'nothing'
+    description: notify or nothing
     required: true
     type: string
     default: "notify"
   AUDIT_AWS_ELB_FULL_HTML_REPORT:
-    description: 'notify' or 'nothing'
+    description: notify or nothing
     required: true
     type: string
     default: "nothing"  
   AUDIT_AWS_ELB_OWNERS_HTML_REPORT:
-    description: 'notify' or 'nothing'
+    description: notify or nothing
     required: true
     type: string
     default: "nothing"  
   AUDIT_AWS_ELB_ROLLUP_REPORT:
-    description: 'notify' or 'nothing'
+    description: notify or nothing
     required: true
     type: string
     default: "nothing"  
   AUDIT_AWS_ELB_DEBUG_REPORT:
-    description: 'notify' or 'nothing'
+    description: notify or nothing
     required: true
     type: string
     default: "nothing"  
@@ -67,3 +66,6 @@ variables:
 #       - eu-central-1
 #       - eu-west-1
 #       - sa-east-1
+
+#      - elb-inventory
+#      - elb-current-ssl-policy
