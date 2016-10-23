@@ -233,7 +233,7 @@ for (email in payloads) {
     table_json_metadata_obj = JSON.parse(table_obj_metadata);
     this_html_metadata_obj = tableify(table_json_metadata_obj);
 
-    html_obj = html_obj + this_html_metadata_obj + this_html_obj + </br>;
+    html_obj = html_obj + this_html_metadata_obj + this_html_obj + '</br>';
   }
   html_obj = style_section + html_obj;
 
