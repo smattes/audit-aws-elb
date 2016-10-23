@@ -4,7 +4,7 @@ coreo_aws_advisor_alert "elb-inventory" do
   display_name "ELB Object Inventory"
   description "This rule performs an inventory on all ELB's in the target AWS account."
   category "Inventory"
-  suggested_action "None"
+  suggested_action ""
   level "Information"
   objectives ["load_balancers"]
   audit_objects ["load_balancer_descriptions.load_balancer_name"]
@@ -177,12 +177,26 @@ for (elb_id in results) {
         '"aws tags" : "' + tags_str + '"' +
         '}';
 
-//    if (kb_link.includes("kb.cloudcoreo.com")) {
+    if (typeof kb_link == "undefined" || kb_link === null){
+      kb_html = "";
+    } else {
       kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
-//    } else {
-//        kb_html = "";
-//    }
-
+    }
+    if (typeof display_name == "undefined" || display_name === null){
+      display_name = "";
+    }
+    if (typeof category == "undefined" || category === null){
+      category = "";
+    }
+    if (typeof action == "undefined" || action === null){
+      action = "";
+    }
+    if (typeof level == "undefined" || level === null){
+      level = "";
+    }
+    if (typeof description == "undefined" || description === null){
+      description = "";
+    }
     ret_metadata =
         '{' +
         '"display name" : "' + display_name + '", ' +
