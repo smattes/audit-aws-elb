@@ -27,19 +27,19 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   alert_when [/ELBSecurityPolicy-2016-08/i]
 end
 
-# coreo_aws_advisor_alert "elb-current-ssl-policy" do
-#   action :define
-#   service :elb
-#   display_name "ELB is using current SSL policy"
-#   description "Elastic Load Balancing (ELB) SSL policy is he latest Amazon predefined SSL policy"
-#   category "Information"
-#   suggested_action "None."
-#   level "Information"
-#   objectives ["load_balancers"]
-#   audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
-#   operators ["=="]
-#   alert_when ["ELBSecurityPolicy-2016-08"]
-# end
+coreo_aws_advisor_alert "elb-current-ssl-policy" do
+  action :define
+  service :elb
+  display_name "ELB is using current SSL policy"
+  description "Elastic Load Balancing (ELB) SSL policy is he latest Amazon predefined SSL policy"
+  category "Information"
+  suggested_action "None."
+  level "Information"
+  objectives ["load_balancers"]
+  audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
+  operators ["=="]
+  alert_when ["ELBSecurityPolicy-2016-08"]
+end
 
 coreo_aws_advisor_elb "advise-elb" do
   alerts ${AUDIT_AWS_ELB_ALERT_LIST}
@@ -240,7 +240,7 @@ coreo_uni_util_notify "advise-package" do
 end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
-  action :notify
+  action :${AUDIT_AWS_ELB_OWNERS_HTML_REPORT}
   notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
 end
 
