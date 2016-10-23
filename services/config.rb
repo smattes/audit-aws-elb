@@ -27,19 +27,19 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   alert_when [/ELBSecurityPolicy-2016-08/i]
 end
 
-coreo_aws_advisor_alert "elb-current-ssl-policy" do
-  action :define
-  service :elb
-  display_name "ELB is using current SSL policy"
-  description "Elastic Load Balancing (ELB) SSL policy is he latest Amazon predefined SSL policy"
-  category "Information"
-  suggested_action "None."
-  level "Information"
-  objectives ["load_balancers"]
-  audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
-  operators ["=="]
-  alert_when ["ELBSecurityPolicy-2016-08"]
-end
+# coreo_aws_advisor_alert "elb-current-ssl-policy" do
+#   action :define
+#   service :elb
+#   display_name "ELB is using current SSL policy"
+#   description "Elastic Load Balancing (ELB) SSL policy is he latest Amazon predefined SSL policy"
+#   category "Information"
+#   suggested_action "None."
+#   level "Information"
+#   objectives ["load_balancers"]
+#   audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
+#   operators ["=="]
+#   alert_when ["ELBSecurityPolicy-2016-08"]
+# end
 
 coreo_aws_advisor_elb "advise-elb" do
   alerts ${AUDIT_AWS_ELB_ALERT_LIST}
@@ -49,7 +49,7 @@ end
 
 ## This is the normal full notification of the primary recipient.
 coreo_uni_util_notify "advise-elb" do
-  action :notify
+  action :${AUDIT_AWS_ELB_FULL_JSON_REPORT}
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"
@@ -78,7 +78,7 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                 "instance_name":"INSTANCE::name",
                 "violations": STACK::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
-console.log('we are running');
+//console.log('we are running');
 var tableify = require('tableify');
 var style_section = "\
 <style>body {\
@@ -146,9 +146,9 @@ for (elb_id in results) {
   }
   tags_str = tags_str.replace(/, $/, "");
   found_owner_tag = false;
-  owner_tag_val = "${AUDIT_AWS_ELB_ALERT_RECIPIENT}";
+  owner_tag_val = "NO_OWNER";
   for (var i = 0; i < tags.length; i++) {
-    if (tags[i]['key'] === 'bv:nexus:team') {
+    if (tags[i]['key'] === '${AUDIT_AWS_ELB_OWNER_TAG}') {
       found_owner_tag = true;
       owner_tag_val = tags[i]['value'];
     }
@@ -219,7 +219,7 @@ end
 # these two jsrunners are for debug purposes only - they send the internal files to you for debugging
 #
 coreo_uni_util_notify "advise-jsrunner-file" do
-  action :notify
+  action :${AUDIT_AWS_ELB_DEBUG_REPORT}
   type 'email'
   allow_empty true
   payload_type "text"
@@ -229,7 +229,7 @@ coreo_uni_util_notify "advise-jsrunner-file" do
   })
 end
 coreo_uni_util_notify "advise-package" do
-  action :notify
+  action :${AUDIT_AWS_ELB_DEBUG_REPORT}
   type 'email'
   allow_empty true
   payload_type "json"
@@ -272,7 +272,7 @@ EOH
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
-  action :notify
+  action :${AUDIT_AWS_ELB_ROLLUP_REPORT}
   type 'email'
   allow_empty true
   send_on 'always'
@@ -283,7 +283,8 @@ coreo_uni_util_notify "advise-elb-rollup" do
   number_of_violations: STACK::coreo_aws_advisor_elb.advise-elb.number_violations
   number_violations_ignored: STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
   rollup report:
-  STACK::coreo_uni_util_jsrunner.tags-rollup.return'
+  STACK::coreo_uni_util_jsrunner.tags-rollup.return
+  '
   payload_type 'text'
   endpoint ({
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
