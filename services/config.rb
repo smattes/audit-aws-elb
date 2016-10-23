@@ -240,7 +240,10 @@ for (email in payloads) {
   notifier['payload'] = html_obj;
   notifier['num_violations'] = nviolations.toString();
 
-  notifiers.push(notifier);
+  if (email != "NO_OWNER") {
+    notifiers.push(notifier);
+  }
+
 }
 callback(notifiers);
 EOH
