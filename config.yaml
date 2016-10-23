@@ -12,6 +12,11 @@ variables:
     required: true
     type: string
     default:
+  AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT:
+    description: email recipient for objects with no owner tag if owner tag is enabled
+    required: true
+    type: string
+    default:
   AUDIT_AWS_ELB_ALLOW_EMPTY:
     description: receive empty reports?
     required: true
@@ -32,11 +37,6 @@ variables:
     required: true
     type: string
     default: "notify"
-  AUDIT_AWS_ELB_FULL_HTML_REPORT:
-    description: notify or nothing
-    required: true
-    type: string
-    default: "notify"  
   AUDIT_AWS_ELB_OWNERS_HTML_REPORT:
     description: notify or nothing
     required: true

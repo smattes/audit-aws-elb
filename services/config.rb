@@ -145,7 +145,10 @@ for (elb_id in results) {
   }
   tags_str = tags_str.replace(/, $/, "");
   found_owner_tag = false;
-  owner_tag_val = "NO_OWNER";
+  owner_tag_val = "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}";
+  if (owner_tag_val == "") {
+    owner_tag_val = "NONE";
+  }
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === '${AUDIT_AWS_ELB_OWNER_TAG}') {
       found_owner_tag = true;
@@ -154,8 +157,8 @@ for (elb_id in results) {
   }
 
   var violation_keys = Object.keys( results[elb_id]["violations"] );
-  pushed_metadata = false;
   for (var j = 0, length = violation_keys.length; j < length; j++) {
+    pushed_metadata = false;
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
     region = this_violation["region"];
@@ -240,7 +243,7 @@ for (email in payloads) {
   notifier['payload'] = html_obj;
   notifier['num_violations'] = nviolations.toString();
 
-  if (email != "NO_OWNER") {
+  if (email != "NONE") {
     notifiers.push(notifier);
   }
 
@@ -282,14 +285,11 @@ coreo_uni_util_jsrunner "tags-rollup" do
   data_type "text"
   json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
   function <<-EOH
-//var rollup = [];
 var rollup_string = "";
 for (var entry=0; entry < json_input.length; entry++) {
   console.log(json_input[entry]);
   if (json_input[entry]['endpoint']['to'].length) {
     console.log('got an email to rollup');
-    //nViolations = json_input[entry]['payload']['violations'].length;
-    //rollup.push({'recipient': json_input[entry]['endpoint']['to'], 'nViolations': nViolations});
     rollup_string = rollup_string + "recipient: " + json_input[entry]['endpoint']['to'] + " - " + "nViolations: " + json_input[entry]['num_violations'] + "\\n";
   }
 }
@@ -308,13 +308,14 @@ coreo_uni_util_notify "advise-elb-rollup" do
   allow_empty true
   send_on 'always'
   payload '
-  stack name: INSTANCE::stack_name
-  instance name: INSTANCE::name
-  number_of_checks: STACK::coreo_aws_advisor_elb.advise-elb.number_checks
-  number_of_violations: STACK::coreo_aws_advisor_elb.advise-elb.number_violations
-  number_violations_ignored: STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
-  rollup report:
-  STACK::coreo_uni_util_jsrunner.tags-rollup.return
+stack name: INSTANCE::stack_name
+instance name: INSTANCE::name
+number_of_checks: STACK::coreo_aws_advisor_elb.advise-elb.number_checks
+number_of_violations: STACK::coreo_aws_advisor_elb.advise-elb.number_violations
+number_violations_ignored: STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
+
+rollup report:
+STACK::coreo_uni_util_jsrunner.tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
