@@ -185,13 +185,6 @@ for (email in payloads) {
   notifier['endpoint'] = endpoint;
   notifier['payload'] = "";
   notifier['num_violations'] = "";
-// tableify goes here
-//ret_table = ret_table + "]";
-//ret_obj = JSON.parse(ret_table);
-//html = tableify(ret_obj);
-//html = style_section + html;
-// notifier['payload']['stack name'] = json_input['stack name'];
-// notifier['payload']['instance name'] = json_input['instance name'];
 
   html_obj = "";
   var alert_rule_keys = Object.keys( payloads[email] );
@@ -209,8 +202,11 @@ for (email in payloads) {
 
   notifier['payload'] = html_obj;
   notifier['num_violations'] = nviolations.toString();
-  //console.log("gjm: " + notifier['payload']);
-  notifiers.push(notifier);
+
+  if (email != "NO_OWNER") {
+    notifiers.push(notifier);
+  }
+
 }
 callback(notifiers);
 EOH
@@ -239,12 +235,6 @@ coreo_uni_util_notify "advise-package" do
   })
 end
 
-coreo_uni_util_notify "advise-elb-to-tag-values" do
-  action :${AUDIT_AWS_ELB_OWNERS_HTML_REPORT}
-  notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
-end
-
-
 #  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
 #  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
 # "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
@@ -269,6 +259,11 @@ for (var entry=0; entry < json_input.length; entry++) {
 }
 callback(rollup_string);
 EOH
+end
+
+coreo_uni_util_notify "advise-elb-to-tag-values" do
+  action :${AUDIT_AWS_ELB_OWNERS_HTML_REPORT}
+  notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
