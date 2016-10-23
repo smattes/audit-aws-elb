@@ -157,7 +157,6 @@ for (elb_id in results) {
   }
 
   var violation_keys = Object.keys( results[elb_id]["violations"] );
-  pushed_metadata = "no";
   for (var j = 0, length = violation_keys.length; j < length; j++) {
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
@@ -196,10 +195,7 @@ for (elb_id in results) {
       payloads[owner_tag_val][this_rule_name]["metadata"] = [];
       payloads[owner_tag_val][this_rule_name]["objects"] = [];
     }
-    if (pushed_metadata == "no") {
-      payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
-      pushed_metadata = "yes";
-    }
+    payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
     payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
   }
 }
@@ -231,7 +227,7 @@ for (email in payloads) {
     table_json_obj = JSON.parse(table_obj);
     this_html_obj = tableify(table_json_obj);
 
-    table_obj_metadata = this_rule_metadata.join();
+    table_obj_metadata = this_rule_metadata[0];
     table_obj_metadata = "[" + table_obj_metadata + "]";
     table_json_metadata_obj = JSON.parse(table_obj_metadata);
     this_html_metadata_obj = tableify(table_json_metadata_obj);
