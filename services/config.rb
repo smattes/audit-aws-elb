@@ -157,8 +157,8 @@ for (elb_id in results) {
   }
 
   var violation_keys = Object.keys( results[elb_id]["violations"] );
+  pushed_metadata = "no";
   for (var j = 0, length = violation_keys.length; j < length; j++) {
-    pushed_metadata = false;
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
     region = this_violation["region"];
@@ -196,9 +196,9 @@ for (elb_id in results) {
       payloads[owner_tag_val][this_rule_name]["metadata"] = [];
       payloads[owner_tag_val][this_rule_name]["objects"] = [];
     }
-    if (pushed_metadata == false) {
+    if (pushed_metadata == "no") {
       payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
-      pushed_metadata = true;
+      pushed_metadata = "yes";
     }
     payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
   }
