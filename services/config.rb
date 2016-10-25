@@ -31,7 +31,7 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   action :define
   service :elb
   display_name "ELB is using current SSL policy"
-  description "Elastic Load Balancing (ELB) SSL policy is he latest Amazon predefined SSL policy"
+  description "Elastic Load Balancing (ELB) SSL policy is the latest Amazon predefined SSL policy"
   category "Information"
   suggested_action "None."
   level "Information"
