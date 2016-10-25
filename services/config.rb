@@ -4,7 +4,7 @@ coreo_aws_advisor_alert "elb-inventory" do
   display_name "ELB Object Inventory"
   description "This rule performs an inventory on all ELB's in the target AWS account."
   category "Inventory"
-  suggested_action ""
+  suggested_action "None."
   level "Information"
   objectives ["load_balancers"]
   audit_objects ["load_balancer_descriptions.load_balancer_name"]
