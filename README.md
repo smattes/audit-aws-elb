@@ -47,6 +47,10 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 1. Alert
 1. ELB
 
+## Categories
+
+1. Audit
+
 ## Diagram
 
 
