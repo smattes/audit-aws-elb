@@ -176,12 +176,16 @@ for (elb_id in results) {
     action = this_violation["suggested_action"];
     aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
     aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
+    violation_entry = '"violating object" : "' + violating_object + '", ';
+    if (violating_object == "") {
+      violation_entry = "";
+    }
     ret_table =
         '{' +
         '"ELB id" : "' + elb_id + '", ' +
         '"region" : "' + region + '", ' +
         '"aws link" : "' + aws_console_html + '", ' +
-        '"violating object" : "' + violating_object + '", ' +
+        violation_entry +
         '"aws tags" : "' + tags_str + '"' +
         '}';
 
