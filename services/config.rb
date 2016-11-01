@@ -161,6 +161,7 @@ for (elb_id in results) {
     this_violation = results[elb_id]["violations"][violation_keys[j]];
     this_rule_name = violation_keys[j];
     region = this_violation["region"];
+    violating_object = this_violation["violating_object"];
     category = this_violation["category"];
     description = this_violation["description"];
     display_name = this_violation["display_name"];
@@ -174,6 +175,7 @@ for (elb_id in results) {
         '"ELB id" : "' + elb_id + '", ' +
         '"region" : "' + region + '", ' +
         '"aws link" : "' + aws_console_html + '", ' +
+        '"violating object" : "' + violating_object + '", ' +
         '"aws tags" : "' + tags_str + '"' +
         '}';
 
