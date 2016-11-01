@@ -162,6 +162,12 @@ for (elb_id in results) {
     this_rule_name = violation_keys[j];
     region = this_violation["region"];
     violating_object = this_violation["violating_object"];
+    if (typeof violating_object == "undefined" || violating_object === null){
+      violating_object = "";
+    }
+    if (typeof violating_object == "object") {
+      violating_object = "";
+    }
     category = this_violation["category"];
     description = this_violation["description"];
     display_name = this_violation["display_name"];
