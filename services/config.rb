@@ -53,15 +53,15 @@ coreo_uni_util_notify "advise-elb" do
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"
-  payload '{"stack name":"INSTANCE::stack_name",
-  "instance name":"INSTANCE::name",
-  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
-  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
-  "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
-  "violations": STACK::coreo_aws_advisor_elb.advise-elb.report }'
+  payload '{"stack name":"PLAN::stack_name",
+  "instance name":"PLAN::name",
+  "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
+  "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
+  "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
+  "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report }'
   payload_type "json"
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
 
@@ -74,9 +74,9 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
           :name => "tableify",
           :version => "1.0.0"
         }       ])
-  json_input '{"stack_name":"INSTANCE::stack_name",
-                "instance_name":"INSTANCE::name",
-                "violations": STACK::coreo_aws_advisor_elb.advise-elb.report}'
+  json_input '{"stack_name":"PLAN::stack_name",
+                "instance_name":"PLAN::name",
+                "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 var tableify = require('tableify');
 var style_section = "\
@@ -287,9 +287,9 @@ coreo_uni_util_notify "advise-jsrunner-file" do
   type 'email'
   allow_empty true
   payload_type "text"
-  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
+  payload 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'jsrunner file for INSTANCE::stack_name :: INSTANCE::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'jsrunner file for PLAN::stack_name :: PLAN::name'
   })
 end
 coreo_uni_util_notify "advise-package" do
@@ -297,21 +297,21 @@ coreo_uni_util_notify "advise-package" do
   type 'email'
   allow_empty true
   payload_type "json"
-  payload 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
+  payload 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'package.json file for INSTANCE::stack_name :: INSTANCE::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'package.json file for PLAN::stack_name :: PLAN::name'
   })
 end
 
-#  "number_of_checks":"STACK::coreo_aws_advisor_elb.advise-elb.number_checks",
-#  "number_of_violations":"STACK::coreo_aws_advisor_elb.advise-elb.number_violations",
-# "number_violations_ignored":"STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
+#  "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
+#  "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
+# "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
 
 # This is the summary report of how many alerts were sent to which emails.
 coreo_uni_util_jsrunner "tags-rollup" do
   action :run
   data_type "text"
-  json_input 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+  json_input 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
   function <<-EOH
 var rollup_string = "";
 for (var entry=0; entry < json_input.length; entry++) {
@@ -327,7 +327,7 @@ end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :${AUDIT_AWS_ELB_OWNERS_HTML_REPORT}
-  notifiers 'STACK::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
+  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
@@ -336,18 +336,18 @@ coreo_uni_util_notify "advise-elb-rollup" do
   allow_empty true
   send_on 'always'
   payload '
-stack name: INSTANCE::stack_name
-instance name: INSTANCE::name
-number_of_checks: STACK::coreo_aws_advisor_elb.advise-elb.number_checks
-number_of_violations: STACK::coreo_aws_advisor_elb.advise-elb.number_violations
-number_violations_ignored: STACK::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
+stack name: PLAN::stack_name
+instance name: PLAN::name
+number_of_checks: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks
+number_of_violations: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations
+number_violations_ignored: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
 
 rollup report:
-STACK::coreo_uni_util_jsrunner.tags-rollup.return
+COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on INSTANCE::stack_name :: INSTANCE::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
 
