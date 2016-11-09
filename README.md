@@ -15,55 +15,55 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 ## Required variables with no default
 
 ### `AUDIT_AWS_ELB_ALERT_RECIPIENT`:
-  * description: email recipient for notification
+  * description: Enter the email address(es) that will receive notifications. If more than one, separate each with a comma.
 
 
 ## Required variables with default
 
 ### `AUDIT_AWS_ELB_ALERT_LIST`:
-  * description: alert list for generating notifications
+  * description: Which alerts would you like to check for? (Default is all ELB alerts)
   * default: elb-old-ssl-policy
 
 ### `AUDIT_AWS_ELB_ALLOW_EMPTY`:
-  * description: receive empty reports?
+  * description: Would you like to receive empty reports? Options - true / false. Default is true.
   * default: true
 
 ### `AUDIT_AWS_ELB_SEND_ON`:
-  * description: always or change
+  * description: Send reports always or only when there is a change? Options - always / change. Default is always.
   * default: always
 
 ### `AUDIT_AWS_ELB_FULL_JSON_REPORT`:
-  * description: notify or nothing
+  * description: Would you like to receive the full JSON report? Options - notify / nothing. Default is notify.
   * default: notify
 
 ### `AUDIT_AWS_ELB_OWNERS_HTML_REPORT`:
-  * description: notify or nothing
+  * description: Would you like to receive the AWS owner tag report? Options - notify / nothing. Default is no / nothing.
   * default: nothing
 
 ### `AUDIT_AWS_ELB_ROLLUP_REPORT`:
-  * description: notify or nothing
+  * description: Would you like to receive a Summary ELB report? Options - notify / nothing. Default is no / nothing.
   * default: nothing
 
 ### `AUDIT_AWS_ELB_DEBUG_REPORT`:
-  * description: notify or nothing
+  * description: Would you like to receive an ELB debug report? Options - notify / nothing. Default is no / nothing.
   * default: nothing
 
 ### `AUDIT_AWS_ELB_REGIONS`:
-  * description: list of AWS regions to check. Default is us-east-1.
-  * default: us-east-1
+  * description: List of AWS regions to check. Default is us-east-1,us-west-1,us-west-2,eu-west-1.
+  * default: us-east-1, us-west-1, us-west-2, eu-west-1
 
 
 ## Optional variables with no default
 
 ### `AUDIT_AWS_ELB_OWNER_TAG`:
-  * description: AWS tag whose value is an email address specifying the owner of the ELB object
+  * description: Enter an AWS tag whose value is an email address of owner of the ELB object. (Optional)
   * default: NOT_A_TAG
 
 
 ## Optional variables with default
 
 ### `AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT`:
-  * description: email recipient for objects with no owner tag if owner tag is enabled
+  * description: Enter the email address(es) that will receive notifications for objects with no owner tag (Optional, only if owner tag is enabled).
 
 ## Tags
 1. Audit
