@@ -336,7 +336,7 @@ coreo_uni_util_jsrunner "tags-rollup" do
 var rollup_string = "";
 for (var entry=0; entry < json_input.length; entry++) {
   console.log(json_input[entry]);
-  if (json_input[entry]['endpoint']['to'].length) {
+  if (json_input[entry] && json_input[entry]['endpoint']['to'].length) {
     console.log('got an email to rollup');
     rollup_string = rollup_string + "recipient: " + json_input[entry]['endpoint']['to'] + " - " + "nViolations: " + json_input[entry]['num_violations'] + "\\n";
   }
