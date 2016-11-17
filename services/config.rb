@@ -78,210 +78,204 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                 "instance_name":"PLAN::name",
                 "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
+var tableify = require('tableify');
+var style_section = "\
+<style>body {\
+font-family :arial;\
+padding : 0px;\
+margin : 0px;\
+}\
+\
+table {\
+font-size: 10pt;\
+border-top : black 1px solid;\
+border-right : black 1px solid;\
+/* border-spacing : 10px */\
+border-collapse : collapse;\
+}\
+\
+td, th {\
+text-align : left;\
+vertical-align : top;\
+white-space: nowrap;\
+overflow: hidden;\
+text-overflow: ellipsis;\
+border-left : black 1px solid;\
+border-bottom: black 1px solid;\
+padding-left : 4px;\
+padding-right : 4px;\
+}\
+\
+th {\
+background-color : #aaaaaa;\
+}\
+\
+td.number {\
+color : blue\
+}\
+\
+td.boolean {\
+color : green;\
+font-style : italic;\
+}\
+\
+td.date {\
+color : purple;\
+}\
+\
+td.null:after {\
+color : gray;\
+font-style : italic;\
+content : null;\
+}\
+</style>\
+";
+payloads = {};
+notifiers = [];
 results = json_input["violations"];
 stack_name = json_input["stack_name"];
 instance_name = json_input["instance_name"];
+for (elb_id in results) {
+  ret_table = "";
+  tags_str = "";
+  tags = results[elb_id]['tags'];
+  for (var i = 0; i < tags.length; i++) {
+    this_tag_key = tags[i]['key'];
+    tags_str = tags_str + this_tag_key + ", ";
+  }
+  tags_str = tags_str.replace(/, $/, "");
+  found_owner_tag = false;
+  owner_tag_val = "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}";
+  if (owner_tag_val == "") {
+    owner_tag_val = "NONE";
+  }
+  for (var i = 0; i < tags.length; i++) {
+    if (tags[i]['key'] === '${AUDIT_AWS_ELB_OWNER_TAG}') {
+      found_owner_tag = true;
+      owner_tag_val = tags[i]['value'];
+    }
+  }
 
-class GeneratorViolationsHTML {
-	constructor() {
-		this.HTML = '';
-		this.alertsObjects = {};
-		this.numViolations = 0;
-		this.notifiers = this.createNotifiers();
-	}
+  var violation_keys = Object.keys( results[elb_id]["violations"] );
+  for (var j = 0, length = violation_keys.length; j < length; j++) {
+    this_violation = results[elb_id]["violations"][violation_keys[j]];
+    this_rule_name = violation_keys[j];
+    region = this_violation["region"];
+    violating_object = this_violation["violating_object"];
+    if (typeof violating_object == "undefined" || violating_object === null){
+      violating_object = "";
+    }
+    if (typeof violating_object == "object") {
+      violating_object = "";
+    }
+    category = this_violation["category"];
+    description = this_violation["description"];
+    display_name = this_violation["display_name"];
+    level = this_violation["level"];
+    kb_link = this_violation["link"];
+    action = this_violation["suggested_action"];
+    aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
+    aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
+    violation_entry = '"violating object" : "' + violating_object + '", ';
+    if (violating_object == "") {
+      violation_entry = "";
+    }
+    ret_table =
+        '{' +
+        '"ELB id" : "' + elb_id + '", ' +
+        '"region" : "' + region + '", ' +
+        '"aws link" : "' + aws_console_html + '", ' +
+        violation_entry +
+        '"aws tags" : "' + tags_str + '"' +
+        '}';
 
-	createTagsStr(tags) {
-		let tags_str = '';
-		tags.forEach(tag => {
-			tags_str += tag['key'] + ', ';
-		});
-		tags_str = tags_str.replace(/, $/, "");
-		return tags_str;
-	}
-
-	createKbHTML(kb_link) {
-		let kb_html = '';
-		if (kb_link) {
-			kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
-		}
-		return kb_html;
-	}
-
-	createLayoutColor(level) {
-		const colors = { red: '#e53e2b', yellow: '#e49530', dark: '#6b6b6b' };
-		if (level == 'Critical') {
-			return colors.red;
-		}
-		if (level == 'Warning') {
-			return colors.yellow;
-		}
-		return colors.dark;
-	}
-
-	createViolationPanelHTML(violation) {
-		const display_name = violation["display_name"] || '';
-		const level = violation["level"] || '';
-		const category = violation["category"] || '';
-		const description = violation["description"] || '';
-		const action = violation["suggested_action"] || '';
-		const alertId = violation['alertId'] || '';
-
-		const kb_html = this.createKbHTML(violation["link"]);
-
-		const layoutColor = this.createLayoutColor(level);
-
-		return `<div style="border:1px solid ` + layoutColor + `;border-left-width:10px;font-family:sans-serif;color:#333333;max-width:700px;font-size: 14px;margin:20px 0;">
-					<div style="padding: 15px;overflow: hidden;border-bottom:1px solid #d4d4d4;margin-bottom: 15px;">
-						<span style="font-size: 18px;font-weight: bold;line-height: 20px;float: left;">
-							` + display_name + `
-						</span>
-						<span style="float: right;color:#6B6B6B;line-height: 20px;">` + level + `</span>
-						<span style="width: 100%;float: left;line-height: 16px;">Alert ID: ` + alertId + `</span>
-					</div>
-					<div style="padding: 0 15px;">
-						<div>
-							<i style="line-height: 18px;">Category</i>
-							<p style="line-height:16px;margin:0 0 20px;">` + category + `</p>
-						</div>
-						<div>
-						<i style="line-height: 18px;">Description</i>
-						<p style="line-height:16px;margin:0 0 20px;">
-							` + description + `
-						</p>
-					</div>
-				</div>
-				<div style="background: #e2e2e2; padding: 15px 15px 2px;">
-					<i style="line-height: 18px;">Suggested Fix</i>
-					<p style="line-height:16px;margin:0 0 20px;">
-						` + action + `
-					</p>
-					<p>` + kb_html + `</p>
-				</div>
-			</div>`;
-	}
-
-	createViolationTableHTML(violation, tags_str, hasTableHeader) {
-		const level = violation["level"] || '';
-		const region = violation["region"];
-		const elb_id = violation['alertId'] || '';
-		const aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region
-				+ "#LoadBalancers:search=" + elb_id + "";
-		const aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-		tags_str = violation['tags'] || 'NONE';
-
-		const layoutColor = this.createLayoutColor(level);
-		if (!hasTableHeader) {
-			return `<div style="display:flex; flex-wrap: wrap; text-align: center; font-weight: bold; font-family:sans-serif;color:#333333;max-width:711px;font-size: 14px; margin-top:20px; text-align:center">
-				        <div style=" width:calc(25% - 32px);border: 1px solid ` + layoutColor + ` ; border-left-width:10px;padding: 10px;">ELB id</div>
-				        <div style="  width:calc(25% - 22px);border: 1px solid ` + layoutColor + ` ;padding: 10px;">region</div>
-				        <div style="  width:calc(25% - 22px);border: 1px solid ` + layoutColor + ` ;padding: 10px;">aws link</div>
-				        <div style="  width:calc(25% - 22px);border: 1px solid ` + layoutColor + ` ;padding: 10px;">aws tags</div>
-				    </div>
-				    <div style="display:flex; flex-wrap: wrap;text-align: center; font-family:sans-serif;color:#333333;max-width:711px;font-size: 14px;">
-	              <div style=" width:calc(25% - 32px);border: 1px solid ` + layoutColor + `; border-left-width:10px;padding: 10px;">` + elb_id + `</div>
-	              <div style="line-height:32px; width:calc(25% - 22px);border: 1px solid ` + layoutColor + `;padding: 10px;">` + region + `</div>
-	              <div style="line-height:32px; width:calc(25% - 22px);border: 1px solid ` + layoutColor + `;padding: 10px;">` + aws_console_html + `</div>
-	              <div style="line-height:32px; width:calc(25% - 22px);border: 1px solid ` + layoutColor + `;padding: 10px;"><span style="background-color: rgba(215, 215, 215, 1);padding: 8px;border-radius: 5px; margin:5px 0">` + tags_str + `</span></div>
-	          </div>`
-		} else {
-			return ` <div style="display:flex; flex-wrap: wrap;text-align: center; font-family:sans-serif;color:#333333;max-width:711px;font-size: 14px;">
-	                <div style="width:calc(25% - 32px);border: 1px solid ` + layoutColor + `; border-left-width:10px;padding: 10px;">` + elb_id + `</div>
-	                <div style=" line-height:32px;width:calc(25% - 22px);border: 1px solid ` + layoutColor + `;padding: 10px;">` + region + `</div>
-	                <div style=" line-height:32px;width:calc(25% - 22px);border: 1px solid ` + layoutColor + `;padding: 10px;">` + aws_console_html + `</div>
-	                <div style=" line-height:32px;width:calc(25% - 22px);border: 1px solid ` + layoutColor + `;padding: 10px;"><span style="background-color: rgba(215, 215, 215, 1);padding: 8px;border-radius: 5px; margin:5px 0">` + tags_str + `</span></div>
-	            </div>`;
-		}
-	}
-
-	addInViolationArray(violation, alertID, tags) {
-		let violationTypes = Object.keys(violation);
-		violationTypes.forEach((violationName) => {
-			if (Object.keys(this.alertsObjects).length == 0) {
-				this.alertsObjects[violationName] = [];
-				let newObject = violation[violationName];
-				newObject.alertId = alertID;
-				newObject.tags = tags;
-				this.alertsObjects[violationName].push(newObject);
-			} else {
-				if (!this.alertsObjects.hasOwnProperty(violationName)) {
-					this.alertsObjects[violationName] = [];
-				}
-				let newObject = violation[violationName];
-				newObject.alertId = alertID;
-				newObject.tags = tags;
-				this.alertsObjects[violationName].push(newObject);
-			}
-		});
-	}
-
-	createHTML() {
-		const violationNames = Object.keys(this.alertsObjects);
-		violationNames.forEach(violationName => {
-			this.alertsObjects[violationName].forEach((violationItem, index) => {
-				if (index === 0) {
-					this.HTML += this.createViolationPanelHTML(violationItem);
-					this.HTML += this.createViolationTableHTML(violationItem, '', false)
-				} else {
-					this.HTML += this.createViolationTableHTML(violationItem, '', true);
-				}
-				this.numViolations++;
-			});
-		});
-
-		return this.HTML;
-	}
-
-	createAlertsObjects() {
-		Object.keys(results).forEach((violation) => {
-			const violationObj = results[violation]['violations'];
-			const tags = this.createTagsStr(results[violation]['tags']);
-			this.addInViolationArray(violationObj, violation, tags);
-		});
-		return this.HTML;
-	}
-
-	createNotifier(endpoint) {
-		this.createAlertsObjects();
-		const violationHTML = this.createHTML();
-		const notifier = {
-			'type': 'email',
-			'send_on': 'always',
-			'allow_empty': 'true',
-			'payload_type': 'html',
-			'endpoint': endpoint,
-			'payload': violationHTML,
-			'num_violations': this.numViolations.toString()
-		};
-		return notifier;
-	}
-
-	createNotifiers() {
-		const notifiers = [];
-		const email = "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}" || 'NONE';
-		const endpoint = { 'to': email };
-
-		const notifier = this.createNotifier(endpoint);
-
-		if (email != "NONE") {
-			notifiers.push(notifier);
-		}
-
-		return notifiers;
-	}
-
-	getNotifiers() {
-		return this.notifiers;
-	}
-
-	getHTML() {
-		return this.HTML;
-	}
-
+    if (typeof kb_link == "undefined" || kb_link === null){
+      kb_html = "";
+    } else {
+      kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
+    }
+    if (typeof display_name == "undefined" || display_name === null){
+      display_name = "";
+    }
+    if (typeof category == "undefined" || category === null){
+      category = "";
+    }
+    if (typeof action == "undefined" || action === null){
+      action = "";
+    }
+    if (typeof level == "undefined" || level === null){
+      level = "";
+    }
+    if (typeof description == "undefined" || description === null){
+      description = "";
+    }
+    ret_metadata =
+        '{' +
+        '"display name" : "' + display_name + '", ' +
+        '"rule id" : "' + this_rule_name + '", ' +
+        '"category" : "' + category + '", ' +
+        '"kb link" : "' + kb_html + '", ' +
+        '"suggested action" : "' + action + '", ' +
+        '"level" : "' + level + '", ' +
+        '"description" : "' + description + '"' +
+        '}';
+    if (!payloads.hasOwnProperty(owner_tag_val)) {
+      payloads[owner_tag_val] = {};
+    }
+    if (!payloads[owner_tag_val].hasOwnProperty(this_rule_name)) {
+      payloads[owner_tag_val][this_rule_name] = {};
+      payloads[owner_tag_val][this_rule_name]["metadata"] = [];
+      payloads[owner_tag_val][this_rule_name]["objects"] = [];
+    }
+    payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
+    payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
+  }
 }
 
-const Generator = new GeneratorViolationsHTML();
-const notifiers = Generator.getNotifiers();
+for (email in payloads) {
+  nviolations = 0;
+  var endpoint = {};
+  endpoint['to'] = email;
+  var notifier = {};
+  notifier['type'] = 'email';
+  notifier['send_on'] = 'always';
+  notifier['allow_empty'] = 'true';
+  notifier['payload_type'] = 'html';
+  notifier['endpoint'] = endpoint;
+  notifier['payload'] = "";
+  notifier['num_violations'] = "";
 
+  html_obj = "";
+  var alert_rule_keys = Object.getOwnPropertyNames( payloads[email] );
+  for (var j = 0, length = alert_rule_keys.length; j < length; j++) {
+    this_rule_violations = payloads[email][alert_rule_keys[j]]["objects"];
+    this_rule_metadata = payloads[email][alert_rule_keys[j]]["metadata"];
+
+    this_rule_name = alert_rule_keys[j];
+    nviolations = nviolations + this_rule_violations.length;
+
+    table_obj = this_rule_violations.join();
+    table_obj = "[" + table_obj + "]";
+    table_json_obj = JSON.parse(table_obj);
+    this_html_obj = tableify(table_json_obj);
+
+    table_obj_metadata = this_rule_metadata[0];
+    table_obj_metadata = "[" + table_obj_metadata + "]";
+    table_json_metadata_obj = JSON.parse(table_obj_metadata);
+    this_html_metadata_obj = tableify(table_json_metadata_obj);
+
+    html_obj = html_obj + this_html_metadata_obj + this_html_obj + '</br>';
+  }
+  html_obj = style_section + html_obj;
+
+  notifier['payload'] = html_obj;
+  notifier['num_violations'] = nviolations.toString();
+
+  if (email != "NONE") {
+    notifiers.push(notifier);
+  }
+
+}
 callback(notifiers);
 EOH
 end
@@ -333,7 +327,7 @@ end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :${AUDIT_AWS_ELB_OWNERS_HTML_REPORT}
-  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
@@ -347,6 +341,7 @@ instance name: PLAN::name
 number_of_checks: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks
 number_of_violations: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations
 number_violations_ignored: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
+
 rollup report:
 COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
   '
@@ -355,3 +350,5 @@ COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
+
+
