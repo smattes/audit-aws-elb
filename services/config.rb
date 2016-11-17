@@ -48,13 +48,14 @@ coreo_aws_advisor_elb "advise-elb" do
 end
 
 ## This is the normal full notification of the primary recipient.
+#
 coreo_uni_util_notify "advise-elb" do
   action :${AUDIT_AWS_ELB_FULL_JSON_REPORT}
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"
-  payload '{"stack name":"PLAN::stack_name",
-  "instance name":"PLAN::name",
+  payload '{"composite name":"PLAN::stack_name",
+  "plan name":"PLAN::name",
   "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
   "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
   "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
@@ -282,8 +283,10 @@ end
 
 # these two jsrunners are for debug purposes only - they send the internal files to you for debugging
 #
+# change nothing to notify to cause these to run
+#
 coreo_uni_util_notify "advise-jsrunner-file" do
-  action :${AUDIT_AWS_ELB_DEBUG_REPORT}
+  action :nothing
   type 'email'
   allow_empty true
   payload_type "text"
@@ -293,7 +296,7 @@ coreo_uni_util_notify "advise-jsrunner-file" do
   })
 end
 coreo_uni_util_notify "advise-package" do
-  action :${AUDIT_AWS_ELB_DEBUG_REPORT}
+  action :nothing
   type 'email'
   allow_empty true
   payload_type "json"
@@ -336,8 +339,8 @@ coreo_uni_util_notify "advise-elb-rollup" do
   allow_empty true
   send_on 'always'
   payload '
-stack name: PLAN::stack_name
-instance name: PLAN::name
+composite name: PLAN::stack_name
+plan name: PLAN::name
 number_of_checks: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks
 number_of_violations: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations
 number_violations_ignored: COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations
