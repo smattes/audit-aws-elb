@@ -187,7 +187,8 @@ for (elb_id in results) {
         '"region" : "' + region + '", ' +
         '"aws link" : "' + aws_console_html + '", ' +
         violation_entry +
-        '"aws tags" : "' + tags_str + '"' +
+        '"aws tags" : "' + tags_str + '",' +
+        '"owner email" : "' + owner_tag_val + '"' +
         '}';
 
     if (typeof kb_link == "undefined" || kb_link === null){
