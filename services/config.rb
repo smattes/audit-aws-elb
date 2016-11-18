@@ -146,10 +146,8 @@ for (elb_id in results) {
   }
   tags_str = tags_str.replace(/, $/, "");
   found_owner_tag = false;
-  owner_tag_val = "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}";
-  if (owner_tag_val == "") {
-    owner_tag_val = "NONE";
-  }
+
+  owner_tag_val = "No Owner";
   for (var i = 0; i < tags.length; i++) {
     if (tags[i]['key'] === '${AUDIT_AWS_ELB_OWNER_TAG}') {
       found_owner_tag = true;
@@ -221,14 +219,21 @@ for (elb_id in results) {
         '"level" : "' + level + '", ' +
         '"description" : "' + description + '"' +
         '}';
+   
+    if (owner_tag_val == "No Owner") {
+      owner_tag_val = "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}";
+    }
+
     if (!payloads.hasOwnProperty(owner_tag_val)) {
       payloads[owner_tag_val] = {};
     }
+
     if (!payloads[owner_tag_val].hasOwnProperty(this_rule_name)) {
       payloads[owner_tag_val][this_rule_name] = {};
       payloads[owner_tag_val][this_rule_name]["metadata"] = [];
       payloads[owner_tag_val][this_rule_name]["objects"] = [];
     }
+    
     payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
     payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
   }
