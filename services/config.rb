@@ -21,10 +21,13 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   category "Security"
   suggested_action "Always use the current AWS predefined security policy."
   level "Critical"
-  objectives ["load_balancers"]
-  audit_objects ["load_balancer_descriptions.listener_descriptions.policy_names"]
-  operators ["!~"]
-  alert_when [/ELBSecurityPolicy-2016-08/i]
+  id_map "modifiers.load_balancer_name"
+  objectives     ["load_balancers", "load_balancer_policies" ]
+  audit_objects  ["", "policy_descriptions"]
+  call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
+  formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
+  operators      ["", "!~"]
+  alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2015-08)?\"?\]/]
 end
 
 coreo_aws_advisor_alert "elb-current-ssl-policy" do
