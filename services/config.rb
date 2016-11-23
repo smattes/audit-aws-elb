@@ -55,7 +55,7 @@ end
 
 ## This is the normal full notification of the primary recipient.
 #
-coreo_uni_util_notify "advise-elb" do
+coreo_uni_util_notify "advise-elb-json" do
   action :${AUDIT_AWS_ELB_FULL_JSON_REPORT}
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
@@ -73,254 +73,28 @@ coreo_uni_util_notify "advise-elb" do
 end
 
 ## This is part of tag parsing code.
+## Create Notifiers
 coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   action :run
   data_type "json"
   packages([
-        {
-          :name => "tableify",
-          :version => "1.0.0"
-        }       ])
-  json_input '{"stack_name":"PLAN::stack_name",
-                "instance_name":"PLAN::name",
+               {
+                   :name => "cloudcoreo-jsrunner-commons",
+                   :version => "1.0.4"
+               }       ])
+  json_input '{ "composite name":"PLAN::stack_name",
+                "plan name":"PLAN::name",
+                "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
+                "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
+                "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
                 "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
-var tableify = require('tableify');
-var style_section = "\
-<style>body {\
-font-family :arial;\
-padding : 0px;\
-margin : 0px;\
-}\
-\
-table {\
-font-size: 10pt;\
-border-top : black 1px solid;\
-border-right : black 1px solid;\
-/* border-spacing : 10px */\
-border-collapse : collapse;\
-}\
-\
-td, th {\
-text-align : left;\
-vertical-align : top;\
-white-space: nowrap;\
-overflow: hidden;\
-text-overflow: ellipsis;\
-border-left : black 1px solid;\
-border-bottom: black 1px solid;\
-padding-left : 4px;\
-padding-right : 4px;\
-}\
-\
-th {\
-background-color : #aaaaaa;\
-}\
-\
-td.number {\
-color : blue\
-}\
-\
-td.boolean {\
-color : green;\
-font-style : italic;\
-}\
-\
-td.date {\
-color : purple;\
-}\
-\
-td.null:after {\
-color : gray;\
-font-style : italic;\
-content : null;\
-}\
-</style>\
-";
-payloads = {};
-notifiers = [];
-results = json_input["violations"];
-stack_name = json_input["stack_name"];
-instance_name = json_input["instance_name"];
-for (elb_id in results) {
-  ret_table = "";
-  tags_str = "";
-  tags = results[elb_id]['tags'];
-  for (var i = 0; i < tags.length; i++) {
-    this_tag_key = tags[i]['key'];
-    tags_str = tags_str + this_tag_key + ", ";
-  }
-  tags_str = tags_str.replace(/, $/, "");
-  found_owner_tag = false;
-
-  owner_tag_val = "No Owner";
-  for (var i = 0; i < tags.length; i++) {
-    if (tags[i]['key'] === '${AUDIT_AWS_ELB_OWNER_TAG}') {
-      found_owner_tag = true;
-      owner_tag_val = tags[i]['value'];
-    }
-  }
-
-  var violation_keys = Object.keys( results[elb_id]["violations"] );
-  for (var j = 0, length = violation_keys.length; j < length; j++) {
-    this_violation = results[elb_id]["violations"][violation_keys[j]];
-    this_rule_name = violation_keys[j];
-    region = this_violation["region"];
-    violating_object = this_violation["violating_object"];
-    if (typeof violating_object == "undefined" || violating_object === null){
-      violating_object = "";
-    }
-    if (typeof violating_object == "object") {
-      violating_object = "";
-    }
-    category = this_violation["category"];
-    description = this_violation["description"];
-    display_name = this_violation["display_name"];
-    level = this_violation["level"];
-    kb_link = this_violation["link"];
-    action = this_violation["suggested_action"];
-    aws_console = "https://console.aws.amazon.com/ec2/v2/home?region=" + region + "#LoadBalancers:search=" + elb_id + "";
-    aws_console_html = "<a href=" + aws_console + ">AWS Console</a>";
-    violation_entry = '"violating object" : "' + violating_object + '", ';
-    if (violating_object == "") {
-      violation_entry = "";
-    }
-    ret_table =
-        '{' +
-        '"ELB id" : "' + elb_id + '", ' +
-        '"region" : "' + region + '", ' +
-        '"aws link" : "' + aws_console_html + '", ' +
-        violation_entry +
-        '"aws tags" : "' + tags_str + '",' +
-        '"owner email" : "' + owner_tag_val + '"' +
-        '}';
-
-    if (typeof kb_link == "undefined" || kb_link === null){
-      kb_html = "";
-    } else {
-      kb_html = "<a href=" + kb_link + ">CloudCoreo Knowledge Base</a>";
-    }
-    if (typeof display_name == "undefined" || display_name === null){
-      display_name = "";
-    }
-    if (typeof category == "undefined" || category === null){
-      category = "";
-    }
-    if (typeof action == "undefined" || action === null){
-      action = "";
-    }
-    if (typeof level == "undefined" || level === null){
-      level = "";
-    }
-    if (typeof description == "undefined" || description === null){
-      description = "";
-    }
-    ret_metadata =
-        '{' +
-        '"display name" : "' + display_name + '", ' +
-        '"rule id" : "' + this_rule_name + '", ' +
-        '"category" : "' + category + '", ' +
-        '"kb link" : "' + kb_html + '", ' +
-        '"suggested action" : "' + action + '", ' +
-        '"level" : "' + level + '", ' +
-        '"description" : "' + description + '"' +
-        '}';
-   
-    if (owner_tag_val == "No Owner") {
-      owner_tag_val = "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}";
-    }
-
-    if (!payloads.hasOwnProperty(owner_tag_val)) {
-      payloads[owner_tag_val] = {};
-    }
-
-    if (!payloads[owner_tag_val].hasOwnProperty(this_rule_name)) {
-      payloads[owner_tag_val][this_rule_name] = {};
-      payloads[owner_tag_val][this_rule_name]["metadata"] = [];
-      payloads[owner_tag_val][this_rule_name]["objects"] = [];
-    }
-    
-    payloads[owner_tag_val][this_rule_name]["metadata"].push(ret_metadata);
-    payloads[owner_tag_val][this_rule_name]["objects"].push(ret_table);
-  }
-}
-
-for (email in payloads) {
-  nviolations = 0;
-  var endpoint = {};
-  endpoint['to'] = email;
-  var notifier = {};
-  notifier['type'] = 'email';
-  notifier['send_on'] = 'always';
-  notifier['allow_empty'] = 'true';
-  notifier['payload_type'] = 'html';
-  notifier['endpoint'] = endpoint;
-  notifier['payload'] = "";
-  notifier['num_violations'] = "";
-
-  html_obj = "";
-  var alert_rule_keys = Object.getOwnPropertyNames( payloads[email] );
-  for (var j = 0, length = alert_rule_keys.length; j < length; j++) {
-    this_rule_violations = payloads[email][alert_rule_keys[j]]["objects"];
-    this_rule_metadata = payloads[email][alert_rule_keys[j]]["metadata"];
-
-    this_rule_name = alert_rule_keys[j];
-    nviolations = nviolations + this_rule_violations.length;
-
-    table_obj = this_rule_violations.join();
-    table_obj = "[" + table_obj + "]";
-    table_json_obj = JSON.parse(table_obj);
-    this_html_obj = tableify(table_json_obj);
-
-    table_obj_metadata = this_rule_metadata[0];
-    table_obj_metadata = "[" + table_obj_metadata + "]";
-    table_json_metadata_obj = JSON.parse(table_obj_metadata);
-    this_html_metadata_obj = tableify(table_json_metadata_obj);
-
-    html_obj = html_obj + this_html_metadata_obj + this_html_obj + '</br>';
-  }
-  html_obj = style_section + html_obj;
-
-  notifier['payload'] = html_obj;
-  notifier['num_violations'] = nviolations.toString();
-
-  if (email != "NONE") {
-    notifiers.push(notifier);
-  }
-
-}
+const CloudCoreoJSRunner = require('cloudcoreo-jsrunner-commons');
+const AuditElb = new CloudCoreoJSRunner(json_input, false, "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}", "${AUDIT_AWS_ELB_OWNER_TAG}");
+const notifiers = AuditElb.getNotifiers();
 callback(notifiers);
-EOH
+  EOH
 end
-
-# these two jsrunners are for debug purposes only - they send the internal files to you for debugging
-#
-# change nothing to notify to cause these to run
-#
-coreo_uni_util_notify "advise-jsrunner-file" do
-  action :nothing
-  type 'email'
-  allow_empty true
-  payload_type "text"
-  payload 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.jsrunner_file'
-  endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'jsrunner file for PLAN::stack_name :: PLAN::name'
-  })
-end
-coreo_uni_util_notify "advise-package" do
-  action :nothing
-  type 'email'
-  allow_empty true
-  payload_type "json"
-  payload 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.packages_file'
-  endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'package.json file for PLAN::stack_name :: PLAN::name'
-  })
-end
-
-#  "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
-#  "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
-# "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
 
 # This is the summary report of how many alerts were sent to which emails.
 coreo_uni_util_jsrunner "tags-rollup" do
@@ -337,7 +111,7 @@ for (var entry=0; entry < json_input.length; entry++) {
   }
 }
 callback(rollup_string);
-EOH
+  EOH
 end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
