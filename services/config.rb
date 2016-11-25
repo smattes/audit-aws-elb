@@ -53,8 +53,12 @@ coreo_aws_advisor_elb "advise-elb" do
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
 
-## This is the normal full notification of the primary recipient.
-#
+
+=begin
+  AWS ELB START METHODS
+  JSON SEND METHOD
+  HTML SEND METHOD
+=end
 coreo_uni_util_notify "advise-elb-json" do
   action :${AUDIT_AWS_ELB_FULL_JSON_REPORT}
   type 'email'
@@ -72,15 +76,13 @@ coreo_uni_util_notify "advise-elb-json" do
   })
 end
 
-## This is part of tag parsing code.
-## Create Notifiers
 coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   action :run
   data_type "json"
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.0.4"
+                   :version => "1.0.5"
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
@@ -96,7 +98,6 @@ callback(notifiers);
   EOH
 end
 
-# This is the summary report of how many alerts were sent to which emails.
 coreo_uni_util_jsrunner "tags-rollup" do
   action :run
   data_type "text"
@@ -139,5 +140,8 @@ COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
+=begin
+  AWS ELB END
+=end
 
 
