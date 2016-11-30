@@ -82,7 +82,7 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.0.7"
+                   :version => "1.0.8"
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
@@ -92,7 +92,7 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                 "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 const CloudCoreoJSRunner = require('cloudcoreo-jsrunner-commons');
-const AuditElb = new CloudCoreoJSRunner(json_input, false, "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}", "${AUDIT_AWS_ELB_OWNER_TAG}");
+const AuditElb = new CloudCoreoJSRunner(json_input, false, "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}", "${AUDIT_AWS_ELB_OWNER_TAG}", 'elb');
 const notifiers = AuditElb.getNotifiers();
 callback(notifiers);
   EOH
