@@ -92,7 +92,7 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                 "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 const CloudCoreoJSRunner = require('cloudcoreo-jsrunner-commons');
-const AuditElb = new CloudCoreoJSRunner(json_input, false, "${AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT}", "${AUDIT_AWS_ELB_OWNER_TAG}", 'elb');
+const AuditElb = new CloudCoreoJSRunner(json_input, false, "${AUDIT_AWS_ELB_ALERT_RECIPIENT_2}", "${AUDIT_AWS_ELB_OWNER_TAG}", 'elb');
 const notifiers = AuditElb.getNotifiers();
 callback(notifiers);
   EOH
@@ -124,7 +124,7 @@ coreo_uni_util_notify "advise-elb-rollup" do
   action :${AUDIT_AWS_ELB_ROLLUP_REPORT}
   type 'email'
   allow_empty true
-  send_on 'always'
+  send_on '${AUDIT_AWS_ELB_SEND_ON}'
   payload '
 composite name: PLAN::stack_name
 plan name: PLAN::name
@@ -137,7 +137,7 @@ COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT_2}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
 =begin
