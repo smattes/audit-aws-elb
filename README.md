@@ -14,8 +14,8 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ## Required variables with no default
 
-### `AUDIT_AWS_ELB_ALERT_RECIPIENT`:
-  * description: Enter the email address(es) that will receive notifications. If more than one, separate each with a comma.
+### `AUDIT_AWS_ELB_ALERT_RECIPIENT_2`:
+  * description: Enter the email address(es) that will receive notifications for objects with no owner tag (Optional, only if owner tag is enabled).
 
 
 ## Required variables with default
@@ -26,11 +26,11 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ### `AUDIT_AWS_ELB_FULL_JSON_REPORT`:
   * description: Would you like to send the full JSON report? Options - notify / nothing. Default is notify.
-  * default: notify
+  * default: nothing
 
 ### `AUDIT_AWS_ELB_OWNERS_HTML_REPORT`:
   * description: Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is no / nothing.
-  * default: nothing
+  * default: notify
 
 ### `AUDIT_AWS_ELB_ROLLUP_REPORT`:
   * description: Would you like to send a Summary ELB report? Options - notify / nothing. Default is no / nothing.
@@ -38,11 +38,11 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ### `AUDIT_AWS_ELB_ALLOW_EMPTY`:
   * description: Would you like to receive empty reports? Options - true / false. Default is true.
-  * default: true
+  * default: false
 
 ### `AUDIT_AWS_ELB_SEND_ON`:
   * description: Send reports always or only when there is a change? Options - always / change. Default is always.
-  * default: always
+  * default: change
 
 ### `AUDIT_AWS_ELB_REGIONS`:
   * description: List of AWS regions to check. Default is us-east-1,us-west-1,us-west-2,eu-west-1.
@@ -58,8 +58,8 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ## Optional variables with no default
 
-### `AUDIT_AWS_ELB_ALERT_NO_OWNER_RECIPIENT`:
-  * description: Enter the email address(es) that will receive notifications for objects with no owner tag (Optional, only if owner tag is enabled).
+### `AUDIT_AWS_ELB_ALERT_RECIPIENT`:
+  * description: Enter the email address(es) that will receive notifications. If more than one, separate each with a comma.
 
 ## Tags
 1. Audit
