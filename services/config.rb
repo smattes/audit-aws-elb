@@ -1,6 +1,7 @@
 coreo_aws_advisor_alert "elb-inventory" do
   action :define
   service :elb
+  #include_violations_in_count false
   display_name "ELB Object Inventory"
   description "This rule performs an inventory on all ELB's in the target AWS account."
   category "Inventory"
