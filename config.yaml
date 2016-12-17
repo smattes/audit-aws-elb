@@ -9,11 +9,6 @@ variables:
       - elb-inventory
   AUDIT_AWS_ELB_ALERT_RECIPIENT:
     description: "Enter the email address(es) that will receive notifications. If more than one, separate each with a comma."
-    required: false
-    type: string
-    default:
-  AUDIT_AWS_ELB_ALERT_RECIPIENT_2:
-    description: "Enter the email address(es) that will receive notifications for objects with no owner tag (Optional, only if owner tag is enabled)."
     required: true
     type: string
     default:
@@ -22,12 +17,7 @@ variables:
     required: false
     type: string
     default: "NOT_A_TAG"
-  AUDIT_AWS_ELB_FULL_JSON_REPORT:
-    description: "Would you like to send the full JSON report? Options - notify / nothing. Default is notify."
-    required: true
-    type: string
-    default: "nothing"
-  AUDIT_AWS_ELB_OWNERS_HTML_REPORT:
+  AUDIT_AWS_ELB_HTML_REPORT:
     description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is no / nothing."
     required: true
     type: string

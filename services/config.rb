@@ -62,7 +62,7 @@ end
   HTML SEND METHOD
 =end
 coreo_uni_util_notify "advise-elb-json" do
-  action :${AUDIT_AWS_ELB_FULL_JSON_REPORT}
+  action :nothing
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"
@@ -94,7 +94,7 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                 "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
   function <<-EOH
 const JSON = json_input;
-const NO_OWNER_EMAIL = "${AUDIT_AWS_ELB_ALERT_RECIPIENT_2}";
+const NO_OWNER_EMAIL = "${AUDIT_AWS_ELB_ALERT_RECIPIENT}";
 const OWNER_TAG = "${AUDIT_AWS_ELB_OWNER_TAG}";
 const AUDIT_NAME = 'elb';
 const IS_KILL_SCRIPTS_SHOW = false;
@@ -135,15 +135,15 @@ callback(rollup_string);
 end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
-  action :${AUDIT_AWS_ELB_OWNERS_HTML_REPORT}
+  action :${AUDIT_AWS_ELB_HTML_REPORT}
   notifiers 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
   action :${AUDIT_AWS_ELB_ROLLUP_REPORT}
   type 'email'
-  allow_empty true
-  send_on '${AUDIT_AWS_ELB_SEND_ON}'
+  allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
+  send_on "${AUDIT_AWS_ELB_SEND_ON}"
   payload '
 composite name: PLAN::stack_name
 plan name: PLAN::name
@@ -156,7 +156,7 @@ COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT_2}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
 =begin
