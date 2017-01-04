@@ -1,9 +1,10 @@
 coreo_aws_advisor_alert "elb-inventory" do
   action :define
   service :elb
+  link "http://kb.cloudcoreo.com/mydoc_elb-inventory.html"
   include_violations_in_count false
   display_name "ELB Object Inventory"
-  description "This rule performs an inventory on all ELB's in the target AWS account."
+  description "This rule performs an inventory on all Classic ELB's in the target AWS account."
   category "Inventory"
   suggested_action "None."
   level "Informational"
@@ -34,6 +35,7 @@ end
 coreo_aws_advisor_alert "elb-current-ssl-policy" do
   action :define
   service :elb
+  link "http://kb.cloudcoreo.com/mydoc_elb-current-ssl-policy.html"
   include_violations_in_count false
   display_name "ELB is using current SSL policy"
   description "Elastic Load Balancing (ELB) SSL policy is the latest Amazon predefined SSL policy"
