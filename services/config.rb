@@ -41,7 +41,7 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   description "Elastic Load Balancing (ELB) SSL policy is the latest Amazon predefined SSL policy"
   category "Informational"
   suggested_action "None."
-  level "Information"
+  level "Informational"
   id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
   audit_objects  ["", "policy_descriptions"]
