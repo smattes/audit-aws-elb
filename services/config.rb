@@ -24,7 +24,6 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   category "Security"
   suggested_action "Always use the current AWS predefined security policy."
   level "Critical"
-  id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
   audit_objects  ["", "policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
@@ -44,7 +43,6 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   category "Informational"
   suggested_action "None."
   level "Informational"
-  id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
   audit_objects  ["", "policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
