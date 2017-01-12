@@ -18,27 +18,27 @@ variables:
     type: string
     default: "NOT_A_TAG"
   AUDIT_AWS_ELB_HTML_REPORT:
-    description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is no / nothing."
+    description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is notify."
     required: true
     type: string
     default: "notify"  
   AUDIT_AWS_ELB_ROLLUP_REPORT:
-    description: "Would you like to send a Summary ELB report? Options - notify / nothing. Default is no / nothing."
+    description: "Would you like to send a Summary ELB report? Options - notify / nothing. Default is nothing."
     required: true
     type: string
     default: "nothing"
   AUDIT_AWS_ELB_ALLOW_EMPTY:
-    description: "Would you like to receive empty reports? Options - true / false. Default is true."
+    description: "Would you like to receive empty reports? Options - true / false. Default is false."
     required: true
     type: string
     default: false
   AUDIT_AWS_ELB_SEND_ON:
-    description: "Send reports always or only when there is a change? Options - always / change. Default is always."
+    description: "Send reports always or only when there is a change? Options - always / change. Default is change."
     required: true
     type: string
     default: "change"  
   AUDIT_AWS_ELB_REGIONS:
-    description: "List of AWS regions to check. Default is us-east-1,us-west-1,us-west-2,eu-west-1."
+    description: "List of AWS regions to check. Default is us-east-1,us-east-2,us-west-1,us-west-2,eu-west-1."
     required: true
     type: array
     default:
