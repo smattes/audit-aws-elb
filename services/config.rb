@@ -12,6 +12,7 @@ coreo_aws_advisor_alert "elb-inventory" do
   audit_objects ["load_balancer_descriptions.load_balancer_name"]
   operators ["=~"]
   alert_when [//]
+  id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
 coreo_aws_advisor_alert "elb-old-ssl-policy" do
@@ -23,13 +24,13 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   category "Security"
   suggested_action "Always use the current AWS predefined security policy."
   level "Critical"
-  id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
   audit_objects  ["", "policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
   alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
 coreo_aws_advisor_alert "elb-current-ssl-policy" do
@@ -42,13 +43,13 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   category "Informational"
   suggested_action "None."
   level "Informational"
-  id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
   audit_objects  ["", "policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "=~"]
   alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
 coreo_aws_advisor_elb "advise-elb" do
