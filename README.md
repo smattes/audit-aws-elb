@@ -25,23 +25,23 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
   * default: elb-old-ssl-policy, elb-current-ssl-policy, elb-inventory
 
 ### `AUDIT_AWS_ELB_HTML_REPORT`:
-  * description: Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is no / nothing.
+  * description: Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is notify.
   * default: notify
 
 ### `AUDIT_AWS_ELB_ROLLUP_REPORT`:
-  * description: Would you like to send a Summary ELB report? Options - notify / nothing. Default is no / nothing.
+  * description: Would you like to send a Summary ELB report? Options - notify / nothing. Default is nothing.
   * default: nothing
 
 ### `AUDIT_AWS_ELB_ALLOW_EMPTY`:
-  * description: Would you like to receive empty reports? Options - true / false. Default is true.
+  * description: Would you like to receive empty reports? Options - true / false. Default is false.
   * default: false
 
 ### `AUDIT_AWS_ELB_SEND_ON`:
-  * description: Send reports always or only when there is a change? Options - always / change. Default is always.
+  * description: Send reports always or only when there is a change? Options - always / change. Default is change.
   * default: change
 
 ### `AUDIT_AWS_ELB_REGIONS`:
-  * description: List of AWS regions to check. Default is us-east-1,us-west-1,us-west-2,eu-west-1.
+  * description: List of AWS regions to check. Default is us-east-1,us-east-2,us-west-1,us-west-2,eu-west-1.
   * default: us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1
 
 
