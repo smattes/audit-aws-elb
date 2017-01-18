@@ -184,7 +184,7 @@ end
   HTML SEND METHOD
 =end
 coreo_uni_util_notify "advise-elb-json" do
-  action :nothing
+  action :notify
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"
