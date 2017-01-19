@@ -60,7 +60,7 @@ end
 
 
 
-coreo_uni_util_jsrunner "jsrunner-process-suppression" do
+coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
   action :run
   provide_composite_access true
   json_input '{"violations":COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
@@ -147,7 +147,7 @@ coreo_uni_util_jsrunner "jsrunner-process-suppression" do
   EOH
 end
 
-coreo_uni_util_jsrunner "jsrunner-process-table" do
+coreo_uni_util_jsrunner "jsrunner-process-table-elb" do
   action :run
   provide_composite_access true
   json_input '{"violations":COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
@@ -173,7 +173,7 @@ end
   HTML SEND METHOD
 =end
 coreo_uni_util_notify "advise-elb-json" do
-  action :notify
+  action :nothing
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"
@@ -199,8 +199,8 @@ coreo_uni_util_jsrunner "tags-to-notifiers-array" do
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
-                "table": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-table.return,
-                "violations": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression.return}'
+                "table": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-table-elb.return,
+                "violations": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression-elb.return}'
   function <<-EOH
   
 const JSON_INPUT = json_input;
