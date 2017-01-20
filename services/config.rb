@@ -1,3 +1,7 @@
+###########################################
+# User Visible Rule Definitions
+###########################################
+
 coreo_aws_advisor_alert "elb-inventory" do
   action :define
   service :elb
@@ -53,6 +57,11 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "object.load_balancer_descriptions.load_balancer_name"
 end
+
+###########################################
+# Compsite-Internal Resources follow until end
+#   (Resources used by the system for execution and display processing)
+###########################################
 
 coreo_aws_advisor_elb "advise-elb" do
   alerts ${AUDIT_AWS_ELB_ALERT_LIST}
