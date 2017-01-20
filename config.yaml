@@ -9,7 +9,7 @@ variables:
       - elb-inventory
   AUDIT_AWS_ELB_ALERT_RECIPIENT:
     description: "Enter the email address(es) that will receive notifiers. If more than one, separate each with a comma."
-    required: true
+    required: false
     type: string
     default:
   AUDIT_AWS_ELB_OWNER_TAG:
@@ -21,7 +21,7 @@ variables:
     description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is notify."
     required: true
     type: string
-    default: "notify"  
+    default: "nothing"  
   AUDIT_AWS_ELB_ROLLUP_REPORT:
     description: "Would you like to send a Summary ELB report? Options - notify / nothing. Default is nothing."
     required: true
