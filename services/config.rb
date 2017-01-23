@@ -35,7 +35,7 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
   alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
-  id_map "object.load_balancer_descriptions.load_balancer_name"
+  id_map "modifiers.load_balancer_name"
 end
 
 coreo_aws_advisor_alert "elb-current-ssl-policy" do
