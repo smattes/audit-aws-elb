@@ -69,8 +69,6 @@ coreo_aws_advisor_elb "advise-elb" do
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
 
-
-
 coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
   action :run
   provide_composite_access true
@@ -200,7 +198,7 @@ coreo_uni_util_notify "advise-elb-json" do
   })
 end
 
-coreo_uni_util_jsrunner "tags-to-notifiers-array" do
+coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   action :run
   data_type "json"
   packages([
@@ -243,10 +241,10 @@ callback(notifiers);
   EOH
 end
 
-coreo_uni_util_jsrunner "tags-rollup" do
+coreo_uni_util_jsrunner "elb-tags-rollup" do
   action :run
   data_type "text"
-  json_input 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return'
+  json_input 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return'
   function <<-EOH
 var rollup_string = "";
 let rollup = '';
@@ -270,7 +268,7 @@ end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :${AUDIT_AWS_ELB_HTML_REPORT}
-  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
+  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return' 
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
@@ -281,7 +279,7 @@ coreo_uni_util_notify "advise-elb-rollup" do
   payload '
 composite name: PLAN::stack_name
 plan name: PLAN::name
-COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
+COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
