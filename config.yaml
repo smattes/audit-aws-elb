@@ -18,7 +18,7 @@ variables:
     type: string
     default: "NOT_A_TAG"
   AUDIT_AWS_ELB_HTML_REPORT:
-    description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is notify."
+    description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is nothing."
     required: true
     type: string
     default: "nothing"  
