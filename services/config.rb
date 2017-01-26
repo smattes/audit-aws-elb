@@ -200,7 +200,7 @@ coreo_uni_util_notify "advise-elb-json" do
   })
 end
 
-coreo_uni_util_jsrunner "tags-to-notifiers-array" do
+coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   action :run
   data_type "json"
   packages([
@@ -259,7 +259,7 @@ end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :${AUDIT_AWS_ELB_HTML_REPORT}
-  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.tags-to-notifiers-array.return' 
+  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return'
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
