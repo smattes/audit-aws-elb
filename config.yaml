@@ -1,7 +1,7 @@
 variables:
   AUDIT_AWS_ELB_ALERT_LIST:
     description: "Which alerts would you like to check for? (Default is all ELB alerts)"
-    required: true
+    required: false
     type: array
     default:
       - elb-old-ssl-policy
