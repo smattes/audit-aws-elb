@@ -1,6 +1,3 @@
-###########################################
-# User Visible Rule Definitions
-###########################################
 
 coreo_aws_advisor_alert "elb-inventory" do
   action :define
@@ -58,18 +55,11 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
-###########################################
-# Compsite-Internal Resources follow until end
-#   (Resources used by the system for execution and display processing)
-###########################################
-
 coreo_aws_advisor_elb "advise-elb" do
   alerts ${AUDIT_AWS_ELB_ALERT_LIST}
   action :advise
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
-
-
 
 coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
   action :run
@@ -158,6 +148,13 @@ coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
   EOH
 end
 
+coreo_uni_util_variables "elb-for-suppression-update-advisor-output" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_aws_advisor_elb.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression-elb.return'}
+            ])
+end
+
 coreo_uni_util_jsrunner "jsrunner-process-table-elb" do
   action :run
   provide_composite_access true
@@ -178,27 +175,6 @@ coreo_uni_util_jsrunner "jsrunner-process-table-elb" do
     callback(table);
   EOH
 end
-=begin
-  AWS ELB START METHODS
-  JSON SEND METHOD
-  HTML SEND METHOD
-=end
-coreo_uni_util_notify "advise-elb-json" do
-  action :nothing
-  type 'email'
-  allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
-  send_on "${AUDIT_AWS_ELB_SEND_ON}"
-  payload '{"composite name":"PLAN::stack_name",
-  "plan name":"PLAN::name",
-  "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
-  "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
-  "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
-  "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report }'
-  payload_type "json"
-  endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
-  })
-end
 
 coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   action :run
@@ -206,7 +182,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.6.7"
+                   :version => "1.6.8"
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
@@ -232,7 +208,7 @@ callback(notifiers);
   EOH
 end
 
-coreo_uni_util_jsrunner "tags-rollup" do
+coreo_uni_util_jsrunner "elb-tags-rollup" do
   action :run
   data_type "text"
   json_input 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return'
@@ -277,8 +253,5 @@ COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
   })
 end
-=begin
-  AWS ELB END
-=end
 
 
