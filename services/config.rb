@@ -71,78 +71,82 @@ coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
                    :version => "3.7.0"
                }       ])
   function <<-EOH
-  var fs = require('fs');
-  var yaml = require('js-yaml');
+  const fs = require('fs');
+  const yaml = require('js-yaml');
   let suppression;
   try {
       suppression = yaml.safeLoad(fs.readFileSync('./suppression.yaml', 'utf8'));
   } catch (e) {
   }
   coreoExport('suppression', JSON.stringify(suppression));
-  var violations = json_input.violations;
-  var result = {};
-    var file_date = null;
-    for (var violator_id in violations) {
-        result[violator_id] = {};
-        result[violator_id].tags = violations[violator_id].tags;
-        result[violator_id].violations = {}
-        for (var rule_id in violations[violator_id].violations) {
-            is_violation = true;
- 
-            result[violator_id].violations[rule_id] = violations[violator_id].violations[rule_id];
-            for (var suppress_rule_id in suppression) {
-                for (var suppress_violator_num in suppression[suppress_rule_id]) {
-                    for (var suppress_violator_id in suppression[suppress_rule_id][suppress_violator_num]) {
-                        file_date = null;
-                        var suppress_obj_id_time = suppression[suppress_rule_id][suppress_violator_num][suppress_violator_id];
-                        if (rule_id === suppress_rule_id) {
- 
-                            if (violator_id === suppress_violator_id) {
-                                var now_date = new Date();
- 
-                                if (suppress_obj_id_time === "") {
-                                    suppress_obj_id_time = new Date();
-                                } else {
-                                    file_date = suppress_obj_id_time;
-                                    suppress_obj_id_time = file_date;
-                                }
-                                var rule_date = new Date(suppress_obj_id_time);
-                                if (isNaN(rule_date.getTime())) {
-                                    rule_date = new Date(0);
-                                }
- 
-                                if (now_date <= rule_date) {
- 
-                                    is_violation = false;
- 
-                                    result[violator_id].violations[rule_id]["suppressed"] = true;
-                                    if (file_date != null) {
-                                        result[violator_id].violations[rule_id]["suppressed_until"] = file_date;
-                                        result[violator_id].violations[rule_id]["suppression_expired"] = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
- 
-                }
-            }
-            if (is_violation) {
- 
-                if (file_date !== null) {
-                    result[violator_id].violations[rule_id]["suppressed_until"] = file_date;
-                    result[violator_id].violations[rule_id]["suppression_expired"] = true;
-                } else {
-                    result[violator_id].violations[rule_id]["suppression_expired"] = false;
-                }
-                result[violator_id].violations[rule_id]["suppressed"] = false;
-            }
-        }
-    }
- 
-    var rtn = result;
+  const violations = json_input.violations;
+  const result = {};
+  let file_date = null;
+  const regionKeys = Object.keys(violations);
+  regionKeys.forEach(region => {
+      result[region] = {};
+      const violationKeys = Object.keys(violations[region]);
+      violationKeys.forEach(violator_id => {
+          result[region][violator_id] = {};
+          result[region][violator_id].tags = violations[region][violator_id].tags;
+          result[region][violator_id].violations = {};
+          const ruleKeys = Object.keys(violations[region][violator_id].violations);
+          ruleKeys.forEach(rule_id => {
+              let is_violation = true;
+              result[region][violator_id].violations[rule_id] = violations[region][violator_id].violations[rule_id];
+              const suppressionRuleKeys = Object.keys(suppression);
+              suppressionRuleKeys.forEach(suppress_rule_id => {
+                  const suppressionViolatorNum = Object.keys(suppression[suppress_rule_id]);
+                  suppressionViolatorNum.forEach(suppress_violator_num => {
+                      const suppressViolatorIdKeys = Object.keys(suppression[suppress_rule_id][suppress_violator_num]);
+                      suppressViolatorIdKeys.forEach(suppress_violator_id => {
+                          file_date = null;
+                          let suppress_obj_id_time = suppression[suppress_rule_id][suppress_violator_num][suppress_violator_id];
+                          if (rule_id === suppress_rule_id) {
   
-  var rtn = result;
+                              if (violator_id === suppress_violator_id) {
+                                  const now_date = new Date();
+  
+                                  if (suppress_obj_id_time === "") {
+                                      suppress_obj_id_time = new Date();
+                                  } else {
+                                      file_date = suppress_obj_id_time;
+                                      suppress_obj_id_time = file_date;
+                                  }
+                                  let rule_date = new Date(suppress_obj_id_time);
+                                  if (isNaN(rule_date.getTime())) {
+                                      rule_date = new Date(0);
+                                  }
+  
+                                  if (now_date <= rule_date) {
+  
+                                      is_violation = false;
+  
+                                      result[region][violator_id].violations[rule_id]["suppressed"] = true;
+                                      if (file_date != null) {
+                                          result[region][violator_id].violations[rule_id]["suppressed_until"] = file_date;
+                                          result[region][violator_id].violations[rule_id]["suppression_expired"] = false;
+                                      }
+                                  }
+                              }
+                          }
+                      });
+                  });
+              });
+              if (is_violation) {
+  
+                  if (file_date !== null) {
+                      result[region][violator_id].violations[rule_id]["suppressed_until"] = file_date;
+                      result[region][violator_id].violations[rule_id]["suppression_expired"] = true;
+                  } else {
+                      result[region][violator_id].violations[rule_id]["suppression_expired"] = false;
+                  }
+                  result[region][violator_id].violations[rule_id]["suppressed"] = false;
+              }
+          });
+      });
+  });
+  
   
   callback(result);
   EOH
@@ -182,7 +186,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.6.8"
+                   :version => "1.7.0"
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
