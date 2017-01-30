@@ -32,7 +32,7 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
   alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
-  id_map "object.load_balancer_descriptions.load_balancer_name"
+  id_map "modifiers.load_balancer_name"
 end
 
 coreo_aws_advisor_alert "elb-current-ssl-policy" do
@@ -52,7 +52,7 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "=~"]
   alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
-  id_map "object.load_balancer_descriptions.load_balancer_name"
+  id_map "modifiers.load_balancer_name"
 end
 
 coreo_aws_advisor_elb "advise-elb" do
@@ -250,7 +250,7 @@ coreo_uni_util_notify "advise-elb-rollup" do
   payload '
 composite name: PLAN::stack_name
 plan name: PLAN::name
-COMPOSITE::coreo_uni_util_jsrunner.tags-rollup.return
+COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
   '
   payload_type 'text'
   endpoint ({

@@ -14,19 +14,14 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ## Required variables with no default
 
-### `AUDIT_AWS_ELB_ALERT_RECIPIENT`:
-  * description: Enter the email address(es) that will receive notifiers. If more than one, separate each with a comma.
+**None**
 
 
 ## Required variables with default
 
-### `AUDIT_AWS_ELB_ALERT_LIST`:
-  * description: Which alerts would you like to check for? (Default is all ELB alerts)
-  * default: elb-old-ssl-policy, elb-current-ssl-policy, elb-inventory
-
 ### `AUDIT_AWS_ELB_HTML_REPORT`:
-  * description: Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is notify.
-  * default: notify
+  * description: Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is nothing.
+  * default: nothing
 
 ### `AUDIT_AWS_ELB_ROLLUP_REPORT`:
   * description: Would you like to send a Summary ELB report? Options - notify / nothing. Default is nothing.
@@ -47,6 +42,10 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ## Optional variables with default
 
+### `AUDIT_AWS_ELB_ALERT_LIST`:
+  * description: Which alerts would you like to check for? (Default is all ELB alerts)
+  * default: elb-old-ssl-policy, elb-current-ssl-policy, elb-inventory
+
 ### `AUDIT_AWS_ELB_OWNER_TAG`:
   * description: Enter an AWS tag whose value is an email address of owner of the ELB object. (Optional)
   * default: NOT_A_TAG
@@ -54,7 +53,8 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ## Optional variables with no default
 
-**None**
+### `AUDIT_AWS_ELB_ALERT_RECIPIENT`:
+  * description: Enter the email address(es) that will receive notifiers. If more than one, separate each with a comma.
 
 ## Tags
 1. Audit
