@@ -1,5 +1,5 @@
 
-coreo_aws_advisor_alert "elb-inventory" do
+coreo_aws_rule "elb-inventory" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-inventory.html"
@@ -12,11 +12,11 @@ coreo_aws_advisor_alert "elb-inventory" do
   objectives ["load_balancers"]
   audit_objects ["load_balancer_descriptions.load_balancer_name"]
   operators ["=~"]
-  alert_when [//]
+  raise_when [//]
   id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
-coreo_aws_advisor_alert "elb-old-ssl-policy" do
+coreo_aws_rule "elb-old-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-old-ssl-policy.html"
@@ -31,11 +31,11 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
-  alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "modifiers.load_balancer_name"
 end
 
-coreo_aws_advisor_alert "elb-current-ssl-policy" do
+coreo_aws_rule "elb-current-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-current-ssl-policy.html"
@@ -51,20 +51,20 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "=~"]
-  alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "modifiers.load_balancer_name"
 end
 
-coreo_aws_advisor_elb "advise-elb" do
-  alerts ${AUDIT_AWS_ELB_ALERT_LIST}
-  action :advise
+coreo_aws_rule_runner_elb "advise-elb" do
+  rules ${AUDIT_AWS_ELB_ALERT_LIST}
+  action :run
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
 
 coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
   action :run
   provide_composite_access true
-  json_input '{"violations":COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
+  json_input '{"violations":COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
   packages([
                {
                    :name => "js-yaml",
@@ -155,14 +155,14 @@ end
 coreo_uni_util_variables "elb-for-suppression-update-advisor-output" do
   action :set
   variables([
-                {'COMPOSITE::coreo_aws_advisor_elb.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression-elb.return'}
+                {'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression-elb.return'}
             ])
 end
 
 coreo_uni_util_jsrunner "jsrunner-process-table-elb" do
   action :run
   provide_composite_access true
-  json_input '{"violations":COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
+  json_input '{"violations":COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
   packages([
                {
                    :name => "js-yaml",
@@ -254,7 +254,7 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb rule results on PLAN::stack_name :: PLAN::name'
   })
 end
 
