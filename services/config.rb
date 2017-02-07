@@ -1,8 +1,5 @@
-###########################################
-# User Visible Rule Definitions
-###########################################
 
-coreo_aws_advisor_alert "elb-inventory" do
+coreo_aws_rule "elb-inventory" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-inventory.html"
@@ -15,11 +12,11 @@ coreo_aws_advisor_alert "elb-inventory" do
   objectives ["load_balancers"]
   audit_objects ["load_balancer_descriptions.load_balancer_name"]
   operators ["=~"]
-  alert_when [//]
+  raise_when [//]
   id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
-coreo_aws_advisor_alert "elb-old-ssl-policy" do
+coreo_aws_rule "elb-old-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-old-ssl-policy.html"
@@ -34,11 +31,11 @@ coreo_aws_advisor_alert "elb-old-ssl-policy" do
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
-  alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "modifiers.load_balancer_name"
 end
 
-coreo_aws_advisor_alert "elb-current-ssl-policy" do
+coreo_aws_rule "elb-current-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-current-ssl-policy.html"
@@ -54,112 +51,150 @@ coreo_aws_advisor_alert "elb-current-ssl-policy" do
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "=~"]
-  alert_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "modifiers.load_balancer_name"
 end
 
-###########################################
-# Compsite-Internal Resources follow until end
-#   (Resources used by the system for execution and display processing)
-###########################################
-
-coreo_aws_advisor_elb "advise-elb" do
-  alerts ${AUDIT_AWS_ELB_ALERT_LIST}
-  action :advise
+coreo_aws_rule_runner_elb "advise-elb" do
+  rules ${AUDIT_AWS_ELB_ALERT_LIST}
+  action :run
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
 
 coreo_uni_util_jsrunner "jsrunner-process-suppression-elb" do
   action :run
   provide_composite_access true
-  json_input '{"violations":COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
+  json_input '{"violations":COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
   packages([
                {
                    :name => "js-yaml",
                    :version => "3.7.0"
                }       ])
   function <<-EOH
-  var fs = require('fs');
-  var yaml = require('js-yaml');
+  const fs = require('fs');
+  const yaml = require('js-yaml');
   let suppression;
   try {
       suppression = yaml.safeLoad(fs.readFileSync('./suppression.yaml', 'utf8'));
   } catch (e) {
   }
   coreoExport('suppression', JSON.stringify(suppression));
-  var violations = json_input.violations;
-  var result = {};
-    var file_date = null;
-    for (var violator_id in violations) {
-        result[violator_id] = {};
-        result[violator_id].tags = violations[violator_id].tags;
-        result[violator_id].violations = {}
-        for (var rule_id in violations[violator_id].violations) {
-            is_violation = true;
- 
-            result[violator_id].violations[rule_id] = violations[violator_id].violations[rule_id];
-            for (var suppress_rule_id in suppression) {
-                for (var suppress_violator_num in suppression[suppress_rule_id]) {
-                    for (var suppress_violator_id in suppression[suppress_rule_id][suppress_violator_num]) {
-                        file_date = null;
-                        var suppress_obj_id_time = suppression[suppress_rule_id][suppress_violator_num][suppress_violator_id];
-                        if (rule_id === suppress_rule_id) {
- 
-                            if (violator_id === suppress_violator_id) {
-                                var now_date = new Date();
- 
-                                if (suppress_obj_id_time === "") {
-                                    suppress_obj_id_time = new Date();
-                                } else {
-                                    file_date = suppress_obj_id_time;
-                                    suppress_obj_id_time = file_date;
-                                }
-                                var rule_date = new Date(suppress_obj_id_time);
-                                if (isNaN(rule_date.getTime())) {
-                                    rule_date = new Date(0);
-                                }
- 
-                                if (now_date <= rule_date) {
- 
-                                    is_violation = false;
- 
-                                    result[violator_id].violations[rule_id]["suppressed"] = true;
-                                    if (file_date != null) {
-                                        result[violator_id].violations[rule_id]["suppressed_until"] = file_date;
-                                        result[violator_id].violations[rule_id]["suppression_expired"] = false;
-                                    }
-                                }
-                            }
-                        }
-                    }
- 
-                }
-            }
-            if (is_violation) {
- 
-                if (file_date !== null) {
-                    result[violator_id].violations[rule_id]["suppressed_until"] = file_date;
-                    result[violator_id].violations[rule_id]["suppression_expired"] = true;
-                } else {
-                    result[violator_id].violations[rule_id]["suppression_expired"] = false;
-                }
-                result[violator_id].violations[rule_id]["suppressed"] = false;
-            }
-        }
-    }
- 
-    var rtn = result;
+  function createViolationWithSuppression(result) {
+      const regionKeys = Object.keys(violations);
+      regionKeys.forEach(regionKey => {
+          result[regionKey] = {};
+          const objectIdKeys = Object.keys(violations[regionKey]);
+          objectIdKeys.forEach(objectIdKey => {
+              createObjectId(regionKey, objectIdKey);
+          });
+      });
+  }
   
-  var rtn = result;
+  function createObjectId(regionKey, objectIdKey) {
+      const wayToResultObjectId = result[regionKey][objectIdKey] = {};
+      const wayToViolationObjectId = violations[regionKey][objectIdKey];
+      wayToResultObjectId.tags = wayToViolationObjectId.tags;
+      wayToResultObjectId.violations = {};
+      createSuppression(wayToViolationObjectId, regionKey, objectIdKey);
+  }
+  
+  
+  function createSuppression(wayToViolationObjectId, regionKey, violationObjectIdKey) {
+      const ruleKeys = Object.keys(wayToViolationObjectId['violations']);
+      ruleKeys.forEach(violationRuleKey => {
+          result[regionKey][violationObjectIdKey].violations[violationRuleKey] = wayToViolationObjectId['violations'][violationRuleKey];
+          Object.keys(suppression).forEach(suppressRuleKey => {
+              suppression[suppressRuleKey].forEach(suppressionObject => {
+                  Object.keys(suppressionObject).forEach(suppressObjectIdKey => {
+                      setDateForSuppression(
+                          suppressionObject, suppressObjectIdKey,
+                          violationRuleKey, suppressRuleKey,
+                          violationObjectIdKey, regionKey
+                      );
+                  });
+              });
+          });
+      });
+  }
+  
+  
+  function setDateForSuppression(
+      suppressionObject, suppressObjectIdKey,
+      violationRuleKey, suppressRuleKey,
+      violationObjectIdKey, regionKey
+  ) {
+      file_date = null;
+      let suppressDate = suppressionObject[suppressObjectIdKey];
+      const areViolationsEqual = violationRuleKey === suppressRuleKey && violationObjectIdKey === suppressObjectIdKey;
+      if (areViolationsEqual) {
+          const nowDate = new Date();
+          const correctDateSuppress = getCorrectSuppressDate(suppressDate);
+          const isSuppressionDate = nowDate <= correctDateSuppress;
+          if (isSuppressionDate) {
+              setSuppressionProp(regionKey, violationObjectIdKey, violationRuleKey, file_date);
+          } else {
+              setSuppressionExpired(regionKey, violationObjectIdKey, violationRuleKey, file_date);
+          }
+      }
+  }
+  
+  
+  function getCorrectSuppressDate(suppressDate) {
+      const hasSuppressionDate = suppressDate !== '';
+      if (hasSuppressionDate) {
+          file_date = suppressDate;
+      } else {
+          suppressDate = new Date();
+      }
+      let correctDateSuppress = new Date(suppressDate);
+      if (isNaN(correctDateSuppress.getTime())) {
+          correctDateSuppress = new Date(0);
+      }
+      return correctDateSuppress;
+  }
+  
+  
+  function setSuppressionProp(regionKey, objectIdKey, violationRuleKey, file_date) {
+      const wayToViolationObject = result[regionKey][objectIdKey].violations[violationRuleKey];
+      wayToViolationObject["suppressed"] = true;
+      if (file_date != null) {
+          wayToViolationObject["suppression_until"] = file_date;
+          wayToViolationObject["suppression_expired"] = false;
+      }
+  }
+  
+  function setSuppressionExpired(regionKey, objectIdKey, violationRuleKey, file_date) {
+      if (file_date !== null) {
+          result[regionKey][objectIdKey].violations[violationRuleKey]["suppression_until"] = file_date;
+          result[regionKey][objectIdKey].violations[violationRuleKey]["suppression_expired"] = true;
+      } else {
+          result[regionKey][objectIdKey].violations[violationRuleKey]["suppression_expired"] = false;
+      }
+      result[regionKey][objectIdKey].violations[violationRuleKey]["suppressed"] = false;
+  }
+  
+  const violations = json_input['violations'];
+  const result = {};
+  createViolationWithSuppression(result, json_input);
+  
   
   callback(result);
   EOH
 end
 
+
+
+coreo_uni_util_variables "elb-for-suppression-update-advisor-output" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression-elb.return'}
+            ])
+end
+
 coreo_uni_util_jsrunner "jsrunner-process-table-elb" do
   action :run
   provide_composite_access true
-  json_input '{"violations":COMPOSITE::coreo_aws_advisor_elb.advise-elb.report}'
+  json_input '{"violations":COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
   packages([
                {
                    :name => "js-yaml",
@@ -176,26 +211,21 @@ coreo_uni_util_jsrunner "jsrunner-process-table-elb" do
     callback(table);
   EOH
 end
-=begin
-  AWS ELB START METHODS
-  JSON SEND METHOD
-  HTML SEND METHOD
-=end
-coreo_uni_util_notify "advise-elb-json" do
-  action :nothing
-  type 'email'
-  allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
-  send_on "${AUDIT_AWS_ELB_SEND_ON}"
-  payload '{"composite name":"PLAN::stack_name",
-  "plan name":"PLAN::name",
-  "number_of_checks":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_checks",
-  "number_of_violations":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_violations",
-  "number_violations_ignored":"COMPOSITE::coreo_aws_advisor_elb.advise-elb.number_ignored_violations",
-  "violations": COMPOSITE::coreo_aws_advisor_elb.advise-elb.report }'
-  payload_type "json"
-  endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
-  })
+
+coreo_uni_util_jsrunner "jsrunner-process-alert-list-elb" do
+  action :run
+  provide_composite_access true
+  json_input '{"violations":COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
+  packages([
+               {
+                   :name => "js-yaml",
+                   :version => "3.7.0"
+               }       ])
+  function <<-EOH
+    let alertListToJSON = "${AUDIT_AWS_ELB_ALERT_LIST}";
+    let alertListArray = alertListToJSON.replace(/'/g, '"');
+    callback(alertListArray);
+  EOH
 end
 
 coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
@@ -204,38 +234,28 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.6.0"
+                   :version => "1.7.8"
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
+                "alert list": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-alert-list-elb.return,
                 "table": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-table-elb.return,
                 "violations": COMPOSITE::coreo_uni_util_jsrunner.jsrunner-process-suppression-elb.return}'
   function <<-EOH
   
+
 const JSON_INPUT = json_input;
 const NO_OWNER_EMAIL = "${AUDIT_AWS_ELB_ALERT_RECIPIENT}";
 const OWNER_TAG = "${AUDIT_AWS_ELB_OWNER_TAG}";
 const ALLOW_EMPTY = "${AUDIT_AWS_ELB_ALLOW_EMPTY}";
 const SEND_ON = "${AUDIT_AWS_ELB_SEND_ON}";
-const AUDIT_NAME = 'elb';
-const TABLES = json_input['table'];
 const SHOWN_NOT_SORTED_VIOLATIONS_COUNTER = false;
 
-const WHAT_NEED_TO_SHOWN_ON_TABLE = {
-    OBJECT_ID: { headerName: 'AWS Object ID', isShown: true},
-    REGION: { headerName: 'Region', isShown: true },
-    AWS_CONSOLE: { headerName: 'AWS Console', isShown: true },
-    TAGS: { headerName: 'Tags', isShown: true },
-    AMI: { headerName: 'AMI', isShown: false },
-    KILL_SCRIPTS: { headerName: 'Kill Cmd', isShown: false }
-};
-
-const VARIABLES = { NO_OWNER_EMAIL, OWNER_TAG, AUDIT_NAME,
-    WHAT_NEED_TO_SHOWN_ON_TABLE, ALLOW_EMPTY, SEND_ON,
-    undefined, undefined, SHOWN_NOT_SORTED_VIOLATIONS_COUNTER};
+const VARIABLES = { NO_OWNER_EMAIL, OWNER_TAG,
+     ALLOW_EMPTY, SEND_ON, SHOWN_NOT_SORTED_VIOLATIONS_COUNTER};
 
 const CloudCoreoJSRunner = require('cloudcoreo-jsrunner-commons');
-const AuditELB = new CloudCoreoJSRunner(JSON_INPUT, VARIABLES, TABLES);
+const AuditELB = new CloudCoreoJSRunner(JSON_INPUT, VARIABLES);
 const notifiers = AuditELB.getNotifiers();
 callback(notifiers);
   EOH
@@ -268,7 +288,7 @@ end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
   action :${AUDIT_AWS_ELB_HTML_REPORT}
-  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return' 
+  notifiers 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return'
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
@@ -283,11 +303,8 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
   '
   payload_type 'text'
   endpoint ({
-      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb advisor alerts on PLAN::stack_name :: PLAN::name'
+      :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb rule results on PLAN::stack_name :: PLAN::name'
   })
 end
-=begin
-  AWS ELB END
-=end
 
 
