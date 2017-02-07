@@ -222,7 +222,7 @@ coreo_uni_util_jsrunner "jsrunner-process-alert-list-elb" do
                    :version => "3.7.0"
                }       ])
   function <<-EOH
-    let alertListToJSON = "${AUDIT_AWS_RDS_ALERT_LIST}";
+    let alertListToJSON = "${AUDIT_AWS_ELB_ALERT_LIST}";
     let alertListArray = alertListToJSON.replace(/'/g, '"');
     callback(alertListArray);
   EOH
