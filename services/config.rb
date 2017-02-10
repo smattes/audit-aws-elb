@@ -3,7 +3,7 @@ coreo_aws_rule "elb-inventory" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-inventory.html"
-  include_violations_in_count false
+  include_violations_in_count true
   display_name "ELB Object Inventory"
   description "This rule performs an inventory on all Classic ELB's in the target AWS account."
   category "Inventory"
@@ -39,7 +39,7 @@ coreo_aws_rule "elb-current-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-current-ssl-policy.html"
-  include_violations_in_count false
+  include_violations_in_count true
   display_name "ELB is using current SSL policy"
   description "Elastic Load Balancing (ELB) SSL policy is the latest Amazon predefined SSL policy"
   category "Informational"
@@ -89,7 +89,7 @@ function setTableAndSuppression() {
   const yaml = require('js-yaml');
   try {
       table = yaml.safeLoad(fs.readFileSync('./table.yaml', 'utf8'));
-      suppression = yaml.safeLoad(fs.readFileSync('./table.yaml', 'utf8'));
+      suppression = yaml.safeLoad(fs.readFileSync('./suppression.yaml', 'utf8'));
   } catch (e) {
   }
   coreoExport('table', JSON.stringify(table));
