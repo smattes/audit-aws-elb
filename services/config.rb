@@ -69,6 +69,10 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
                {
                    :name => "cloudcoreo-jsrunner-commons",
                    :version => "1.8.2"
+               },
+               {
+                   :name => "js-yaml",
+                   :version => "3.7.0"
                }       ])
   json_input '{ "composite name":"PLAN::stack_name",
                 "plan name":"PLAN::name",
