@@ -175,12 +175,12 @@ callback(textRollup);
 end
 
 coreo_uni_util_notify "advise-elb-to-tag-values" do
-  action :${AUDIT_AWS_ELB_HTML_REPORT}
+  action((("${AUDIT_AWS_ELB_ALERT_RECIPIENT}".length > 0)) ? :notify : :nothing)
   notifiers 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return'
 end
 
 coreo_uni_util_notify "advise-elb-rollup" do
-  action :${AUDIT_AWS_ELB_ROLLUP_REPORT}
+  action((("${AUDIT_AWS_ELB_ALERT_RECIPIENT}".length > 0) and (! "${AUDIT_AWS_ELB_OWNER_TAG}".eql?("NOT_A_TAG"))) ? :notify : :nothing)
   type 'email'
   allow_empty ${AUDIT_AWS_ELB_ALLOW_EMPTY}
   send_on "${AUDIT_AWS_ELB_SEND_ON}"

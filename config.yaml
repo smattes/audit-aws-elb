@@ -17,11 +17,6 @@ variables:
     required: false
     type: string
     default: "NOT_A_TAG"
-  AUDIT_AWS_ELB_HTML_REPORT:
-    description: "Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is nothing."
-    required: true
-    type: string
-    default: "nothing"  
   AUDIT_AWS_ELB_ROLLUP_REPORT:
     description: "Would you like to send a Summary ELB report? Options - notify / nothing. Default is nothing."
     required: true
