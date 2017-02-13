@@ -55,16 +55,37 @@ coreo_aws_rule "elb-current-ssl-policy" do
   id_map "modifiers.load_balancer_name"
 end
 
+coreo_uni_util_variables "planwide" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_uni_util_variables.planwide.composite_name' => 'PLAN::stack_name'},
+                {'COMPOSITE::coreo_uni_util_variables.planwide.plan_name' => 'PLAN::name'},
+                {'COMPOSITE::coreo_uni_util_variables.planwide.results' => 'unset'},
+                {'COMPOSITE::coreo_uni_util_variables.planwide.number_violations' => 'unset'}
+            ])
+end
+
+
 coreo_aws_rule_runner_elb "advise-elb" do
   rules ${AUDIT_AWS_ELB_ALERT_LIST}
   action :run
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
 
+coreo_uni_util_variables "update-planwide-1" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_uni_util_variables.planwide.results' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report'},
+                {'COMPOSITE::coreo_uni_util_variables.planwide.number_violations' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.number_violations'},
+
+            ])
+end
+
 
 coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   action :run
   data_type "json"
+  provide_composite_access true
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
