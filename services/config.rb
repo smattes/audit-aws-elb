@@ -93,7 +93,7 @@ function setTableAndSuppression() {
   } catch (e) {
   }
   coreoExport('table', JSON.stringify(table));
-  coreoExport('suppression', JSON.stringify(table));
+  coreoExport('suppression', JSON.stringify(suppression));
   
   let alertListToJSON = "${AUDIT_AWS_ELB_ALERT_LIST}";
   let alertListArray = alertListToJSON.replace(/'/g, '"');
