@@ -139,9 +139,24 @@ const VARIABLES = { NO_OWNER_EMAIL, OWNER_TAG,
 const CloudCoreoJSRunner = require('cloudcoreo-jsrunner-commons');
 const AuditELB = new CloudCoreoJSRunner(JSON_INPUT, VARIABLES);
 const notifiers = AuditELB.getNotifiers();
+
+const JSONReportAfterGeneratingSuppression = AuditELB.getJSONForAuditPanel();
+coreoExport('JSONReport', JSON.stringify(JSONReportAfterGeneratingSuppression));
+
 callback(notifiers);
   EOH
 end
+
+
+
+coreo_uni_util_variables "update-planwide-3" do
+  action :set
+  variables([
+                {'COMPOSITE::coreo_uni_util_variables.planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.JSONReport'},
+                {'COMPOSITE::coreo_uni_util_variables.planwide.table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
+            ])
+end
+
 
 coreo_uni_util_jsrunner "elb-tags-rollup" do
   action :run
