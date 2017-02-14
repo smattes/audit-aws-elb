@@ -3,7 +3,7 @@ coreo_aws_rule "elb-inventory" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-inventory.html"
-  include_violations_in_count true
+  include_violations_in_count false
   display_name "ELB Object Inventory"
   description "This rule performs an inventory on all Classic ELB's in the target AWS account."
   category "Inventory"
@@ -39,7 +39,7 @@ coreo_aws_rule "elb-current-ssl-policy" do
   action :define
   service :elb
   link "http://kb.cloudcoreo.com/mydoc_elb-current-ssl-policy.html"
-  include_violations_in_count true
+  include_violations_in_count false
   display_name "ELB is using current SSL policy"
   description "Elastic Load Balancing (ELB) SSL policy is the latest Amazon predefined SSL policy"
   category "Informational"
@@ -65,7 +65,6 @@ coreo_uni_util_variables "planwide" do
             ])
 end
 
-
 coreo_aws_rule_runner_elb "advise-elb" do
   rules ${AUDIT_AWS_ELB_ALERT_LIST}
   action :run
@@ -80,7 +79,6 @@ coreo_uni_util_variables "update-planwide-1" do
 
             ])
 end
-
 
 coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   action :run
@@ -100,19 +98,27 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
                 "violations": COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
   function <<-EOH
   
-
-
 function setTableAndSuppression() {
   let table;
   let suppression;
 
   const fs = require('fs');
   const yaml = require('js-yaml');
+
   try {
       table = yaml.safeLoad(fs.readFileSync('./table.yaml', 'utf8'));
-      suppression = yaml.safeLoad(fs.readFileSync('./suppression.yaml', 'utf8'));
   } catch (e) {
+    console.log("error loading table YAML");
+    table = {};
+
   }
+  try {
+    suppression = yaml.safeLoad(fs.readFileSync('./suppression.yaml', 'utf8'));
+  } catch (e) {
+    console.log("error loading suppression YAML");
+    suppression = {};
+  }
+
   coreoExport('table', JSON.stringify(table));
   coreoExport('suppression', JSON.stringify(suppression));
   
@@ -122,7 +128,6 @@ function setTableAndSuppression() {
   json_input['suppression'] = suppression || [];
   json_input['table'] = table || {};
 }
-
 
 setTableAndSuppression();
 
@@ -147,8 +152,6 @@ callback(notifiers);
   EOH
 end
 
-
-
 coreo_uni_util_variables "update-planwide-3" do
   action :set
   variables([
@@ -156,7 +159,6 @@ coreo_uni_util_variables "update-planwide-3" do
                 {'COMPOSITE::coreo_uni_util_variables.planwide.table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
             ])
 end
-
 
 coreo_uni_util_jsrunner "elb-tags-rollup" do
   action :run
@@ -180,7 +182,6 @@ function setTextRollup() {
     textRollup += 'Rollup' + "\\n";
     textRollup += emailText;
 }
-
 
 let textRollup = '';
 setTextRollup();
