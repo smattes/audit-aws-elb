@@ -55,13 +55,13 @@ coreo_aws_rule "elb-current-ssl-policy" do
   id_map "modifiers.load_balancer_name"
 end
 
-coreo_uni_util_variables "planwide" do
+coreo_uni_util_variables "elb-planwide" do
   action :set
   variables([
-                {'COMPOSITE::coreo_uni_util_variables.planwide.composite_name' => 'PLAN::stack_name'},
-                {'COMPOSITE::coreo_uni_util_variables.planwide.plan_name' => 'PLAN::name'},
-                {'COMPOSITE::coreo_uni_util_variables.planwide.results' => 'unset'},
-                {'COMPOSITE::coreo_uni_util_variables.planwide.number_violations' => 'unset'}
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.composite_name' => 'PLAN::stack_name'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.plan_name' => 'PLAN::name'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'unset'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.number_violations' => 'unset'}
             ])
 end
 
@@ -71,11 +71,11 @@ coreo_aws_rule_runner_elb "advise-elb" do
   regions ${AUDIT_AWS_ELB_REGIONS}
 end
 
-coreo_uni_util_variables "update-planwide-1" do
+coreo_uni_util_variables "elb-update-planwide-1" do
   action :set
   variables([
-                {'COMPOSITE::coreo_uni_util_variables.planwide.results' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report'},
-                {'COMPOSITE::coreo_uni_util_variables.planwide.number_violations' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.number_violations'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.number_violations' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.number_violations'},
 
             ])
 end
@@ -152,11 +152,11 @@ callback(notifiers);
   EOH
 end
 
-coreo_uni_util_variables "update-planwide-3" do
+coreo_uni_util_variables "elb-update-planwide-3" do
   action :set
   variables([
-                {'COMPOSITE::coreo_uni_util_variables.planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.JSONReport'},
-                {'COMPOSITE::coreo_uni_util_variables.planwide.table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.JSONReport'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
             ])
 end
 
