@@ -19,14 +19,6 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 
 ## Required variables with default
 
-### `AUDIT_AWS_ELB_HTML_REPORT`:
-  * description: Would you like to send the AWS owner tag report(s)? Options - notify / nothing. Default is nothing.
-  * default: nothing
-
-### `AUDIT_AWS_ELB_ROLLUP_REPORT`:
-  * description: Would you like to send a Summary ELB report? Options - notify / nothing. Default is nothing.
-  * default: nothing
-
 ### `AUDIT_AWS_ELB_ALLOW_EMPTY`:
   * description: Would you like to receive empty reports? Options - true / false. Default is false.
   * default: false
@@ -36,15 +28,15 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
   * default: change
 
 ### `AUDIT_AWS_ELB_REGIONS`:
-  * description: List of AWS regions to check. Default is us-east-1,us-east-2,us-west-1,us-west-2,eu-west-1.
-  * default: us-east-1, us-east-2, us-west-1, us-west-2, eu-west-1
+  * description: List of AWS regions to check. Default is all regions. Choices are us-east-1,us-east-2,us-west-1,us-west-2,ca-central-1,ap-south-1,ap-northeast-2,ap-southeast-1,ap-southeast-2,ap-northeast-1,eu-central-1,eu-west-1,eu-west-1,sa-east-1
+  * default: us-east-1, us-east-2, us-west-1, us-west-2, ca-central-1, ap-south-1, ap-northeast-2, ap-southeast-1, ap-southeast-2, ap-northeast-1, eu-central-1, eu-west-1, eu-west-2, sa-east-1
 
 
 ## Optional variables with default
 
 ### `AUDIT_AWS_ELB_ALERT_LIST`:
-  * description: Which alerts would you like to check for? (Default is all ELB alerts)
-  * default: elb-old-ssl-policy, elb-current-ssl-policy, elb-inventory
+  * description: Which alerts would you like to check for? Default is all ELB alerts. Choices are elb-old-ssl-policy,elb-current-ssl-policy,elb-inventory
+  * default: elb-old-ssl-policy
 
 ### `AUDIT_AWS_ELB_OWNER_TAG`:
   * description: Enter an AWS tag whose value is an email address of owner of the ELB object. (Optional)
