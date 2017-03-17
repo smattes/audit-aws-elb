@@ -87,7 +87,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.9.6"
+                   :version => "1.9.6-beta1"
                },
                {
                    :name => "js-yaml",
