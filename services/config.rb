@@ -61,7 +61,7 @@ coreo_uni_util_variables "elb-planwide" do
                 {'COMPOSITE::coreo_uni_util_variables.elb-planwide.composite_name' => 'PLAN::stack_name'},
                 {'COMPOSITE::coreo_uni_util_variables.elb-planwide.plan_name' => 'PLAN::name'},
                 {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'unset'},
-                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.number_violations' => '0'}
+                {'GLOBAL::number_violations' => '0'}
             ])
 end
 
@@ -75,7 +75,7 @@ coreo_uni_util_variables "elb-update-planwide-1" do
   action :set
   variables([
                 {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report'},
-                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.number_violations' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.number_violations'},
+                {'GLOBAL::number_violations' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.number_violations'},
 
             ])
 end
@@ -158,7 +158,7 @@ coreo_uni_util_variables "elb-update-planwide-3" do
   action :set
   variables([
                 {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.JSONReport'},{'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'},
-                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
+                {'GLOBAL::table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
             ])
 end
 
