@@ -2,7 +2,7 @@
 coreo_aws_rule "elb-inventory" do
   action :define
   service :elb
-  link "http://kb.cloudcoreo.com/mydoc_unused-alert-definition.html"
+  link "http://kb.cloudcoreo.com/mydoc_all-inventory.html"
   include_violations_in_count false
   display_name "ELB Object Inventory"
   description "This rule performs an inventory on all Classic ELB's in the target AWS account."
