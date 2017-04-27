@@ -35,8 +35,8 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 ## Optional variables with default
 
 ### `AUDIT_AWS_ELB_ALERT_LIST`:
-  * description: Which alerts would you like to check for? Default is all ELB alerts. Choices are elb-old-ssl-policy,elb-current-ssl-policy,elb-inventory
-  * default: elb-inventory, elb-current-ssl-policy, elb-old-ssl-policy
+  * description: Which rules would you like to run? Possible values are elb-inventory elb-old-ssl-policy elb-current-ssl-policy
+  * default: elb-inventory, elb-old-ssl-policy, elb-current-ssl-policy
 
 ### `AUDIT_AWS_ELB_OWNER_TAG`:
   * description: Enter an AWS tag whose value is an email address of owner of the ELB object. (Optional)
