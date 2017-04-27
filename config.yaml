@@ -1,12 +1,12 @@
 variables:
   AUDIT_AWS_ELB_ALERT_LIST:
-    description: "Which alerts would you like to check for? Default is all ELB alerts. Choices are elb-old-ssl-policy,elb-current-ssl-policy,elb-inventory"
     required: false
     type: array
     default:
-      - elb-inventory
-      - elb-current-ssl-policy
-      - elb-old-ssl-policy
+        - elb-inventory # not_violation
+        - elb-old-ssl-policy #
+        - elb-current-ssl-policy # not_violation
+    description: "Which rules would you like to run? Possible values are elb-inventory elb-old-ssl-policy elb-current-ssl-policy"
   AUDIT_AWS_ELB_ALERT_RECIPIENT:
     description: "Enter the email address(es) that will receive notifiers. If more than one, separate each with a comma."
     required: false
