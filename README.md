@@ -55,7 +55,7 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 1. ELB
 
 ## Categories
-1. Audit
+1. AWS Services Audit
 
 
 
