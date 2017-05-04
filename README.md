@@ -1,10 +1,10 @@
-audit ELB
+elb audit
 ============================
-This stack will monitor ELB and alert on things CloudCoreo developers think are violations of best practices
+This composite monitors elb and reports best practice violations, standards body policy violations, and inventory
 
 
 ## Description
-This repo is designed to work with CloudCoreo. It will monitor ELB against best practices for you and send a report to the email address designated by the config.yaml AUDIT&#95;AWS&#95;ELB&#95;ALERT&#95;RECIPIENT value
+This composite monitors elb against best practices and optionally emails a report to per the AUDIT&#95;AWS&#95;ELB&#95;ALERT&#95;RECIPIENT plan variable.
 
 
 ## Hierarchy
@@ -51,12 +51,12 @@ This repo is designed to work with CloudCoreo. It will monitor ELB against best 
 ## Tags
 1. Audit
 1. Best Practices
-1. Alert
-1. ELB
+1. Inventory
+1. elb
+
 
 ## Categories
 1. AWS Services Audit
-
 
 
 ## Diagram

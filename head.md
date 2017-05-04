@@ -1,3 +1,3 @@
-audit ELB
+elb audit
 ============================
-This stack will monitor ELB and alert on things CloudCoreo developers think are violations of best practices
+This composite monitors elb and reports best practice violations, standards body policy violations, and inventory
