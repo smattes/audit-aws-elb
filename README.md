@@ -4,7 +4,7 @@ This composite monitors elb and reports best practice violations, standards body
 
 
 ## Description
-This composite monitors elb against best practices and reports violations and inventory.
+This composite monitors elb against best practices and reports violations and inventory
 
 
 ## Hierarchy
