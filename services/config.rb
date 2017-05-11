@@ -16,6 +16,23 @@ coreo_aws_rule "elb-inventory" do
   id_map "object.load_balancer_descriptions.load_balancer_name"
 end
 
+coreo_aws_rule "elb-load-balancers-active-security-groups-list" do
+  action :define
+  service :elb
+  include_violations_in_count false
+  link "http://kb.cloudcoreo.com/mydoc_unused-alert-definition.html"
+  display_name "CloudCoreo Use Only"
+  description "This is an internally defined alert."
+  category "Internal"
+  suggested_action "Ignore"
+  level "Internal"
+  objectives ["load_balancers"]
+  audit_objects ["load_balancer_descriptions.security_groups"]
+  operators ["=~"]
+  raise_when [//]
+  id_map "object.load_balancer_descriptions.load_balancer_name"
+end
+
 coreo_aws_rule "elb-old-ssl-policy" do
   action :define
   service :elb
