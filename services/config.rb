@@ -109,7 +109,7 @@ const OWNER_TAG = "${AUDIT_AWS_ELB_OWNER_TAG}";
 const ALLOW_EMPTY = "${AUDIT_AWS_ELB_ALLOW_EMPTY}";
 const SEND_ON = "${AUDIT_AWS_ELB_SEND_ON}";
 
-const alertListJSON = "[${AUDIT_AWS_ELB_ALERT_LIST}]";
+const alertListJSON = [${AUDIT_AWS_ELB_ALERT_LIST}];
 const alertListArray = alertListJSON.replace(/'/g, '"');
 const ruleInputs = {};
 
