@@ -36,7 +36,7 @@ This composite monitors elb against best practices and reports violations and in
 
 ### `AUDIT_AWS_ELB_ALERT_LIST`:
   * description: Which rules would you like to run? Possible values are elb-inventory elb-old-ssl-policy elb-current-ssl-policy
-  * default: elb-inventory, elb-old-ssl-policy, elb-current-ssl-policy
+  * default: elb-inventory, elb-old-ssl-policy, elb-current-ssl-policy, elb-load-balancers-active-security-groups-list
 
 ### `AUDIT_AWS_ELB_OWNER_TAG`:
   * description: Enter an AWS tag whose value is an email address of owner of the ELB object. (Optional)
