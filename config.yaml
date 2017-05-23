@@ -3,7 +3,6 @@ variables:
     required: false
     type: array
     default:
-        - elb-inventory # not_violation
         - elb-old-ssl-policy #
         - elb-current-ssl-policy # not_violation
         - elb-load-balancers-active-security-groups-list
