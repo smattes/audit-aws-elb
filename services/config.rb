@@ -42,6 +42,7 @@ coreo_aws_rule "elb-old-ssl-policy" do
   category "Security"
   suggested_action "Always use the current AWS predefined security policy."
   level "High"
+  meta_nist_171_id "3.5.4"
   id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
   audit_objects  ["", "policy_descriptions"]
