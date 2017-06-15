@@ -87,6 +87,7 @@ coreo_aws_rule_runner_elb "advise-elb" do
   rules ${AUDIT_AWS_ELB_ALERT_LIST}
   action :run
   regions ${AUDIT_AWS_ELB_REGIONS}
+  filter(${FILTERED_OBJECTS}) if ${FILTERED_OBJECTS}
 end
 
 coreo_uni_util_variables "elb-update-planwide-1" do
