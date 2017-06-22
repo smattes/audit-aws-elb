@@ -46,8 +46,8 @@ variables:
         - eu-west-1
         - eu-west-2
         - sa-east-1
-    FILTERED_OBJECTS:
-        description: "JSON object of string or regex of aws objects to include or exclude and tag in audit"
-        required: false
-        type: string
-        default:
+  FILTERED_OBJECTS:
+    description: "JSON object of string or regex of aws objects to include or exclude and tag in audit"
+    required: false
+    type: string
+    default:
