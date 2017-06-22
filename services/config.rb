@@ -83,10 +83,12 @@ coreo_uni_util_variables "elb-planwide" do
             ])
 end
 
-coreo_aws_rule_runner_elb "advise-elb" do
+coreo_aws_rule_runner "advise-elb" do
   rules ${AUDIT_AWS_ELB_ALERT_LIST}
+  service :elb
   action :run
   regions ${AUDIT_AWS_ELB_REGIONS}
+  filter(${FILTERED_OBJECTS}) if ${FILTERED_OBJECTS}
 end
 
 coreo_uni_util_variables "elb-update-planwide-1" do
@@ -116,7 +118,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
                 "cloudAccountName": "PLAN::cloud_account_name",
                 "violations": COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
   function <<-EOH
-  
+
 const compositeName = json_input.compositeName;
 const planName = json_input.planName;
 const cloudAccount = json_input.cloudAccountName;
