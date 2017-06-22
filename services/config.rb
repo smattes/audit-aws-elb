@@ -94,8 +94,8 @@ end
 coreo_uni_util_variables "elb-update-planwide-1" do
   action :set
   variables([
-                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report'},
-                {'GLOBAL::number_violations' => 'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.number_violations'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_aws_rule_runner.advise-elb.report'},
+                {'GLOBAL::number_violations' => 'COMPOSITE::coreo_aws_rule_runner.advise-elb.number_violations'},
 
             ])
 end
@@ -116,7 +116,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   json_input '{ "compositeName":"PLAN::stack_name",
                 "planName":"PLAN::name",
                 "cloudAccountName": "PLAN::cloud_account_name",
-                "violations": COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report}'
+                "violations": COMPOSITE::coreo_aws_rule_runner.advise-elb.report}'
   function <<-EOH
 
 const compositeName = json_input.compositeName;
@@ -193,7 +193,7 @@ end
 coreo_uni_util_variables "elb-update-planwide-3" do
   action :set
   variables([
-                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.JSONReport'},{'COMPOSITE::coreo_aws_rule_runner_elb.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'},
+                {'COMPOSITE::coreo_uni_util_variables.elb-planwide.results' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.JSONReport'},{'COMPOSITE::coreo_aws_rule_runner.advise-elb.report' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'},
                 {'GLOBAL::table' => 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.table'}
             ])
 end
