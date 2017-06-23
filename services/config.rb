@@ -1,7 +1,7 @@
 
 coreo_aws_rule "elb-inventory" do
   action :define
-  service :elb
+  service :ElasticLoadBalancing
   link "http://kb.cloudcoreo.com/mydoc_all-inventory.html"
   include_violations_in_count false
   display_name "ELB Object Inventory"
@@ -18,7 +18,7 @@ end
 
 coreo_aws_rule "elb-load-balancers-active-security-groups-list" do
   action :define
-  service :elb
+  service :ElasticLoadBalancing
   include_violations_in_count false
   link "http://kb.cloudcoreo.com/mydoc_unused-alert-definition.html"
   display_name "CloudCoreo Use Only"
@@ -35,7 +35,7 @@ end
 
 coreo_aws_rule "elb-old-ssl-policy" do
   action :define
-  service :elb
+  service :ElasticLoadBalancing
   link "http://kb.cloudcoreo.com/mydoc_elb-old-ssl-policy.html"
   display_name "ELB is using old SSL policy"
   description "Elastic Load Balancing (ELB) SSL policy is not the latest Amazon predefined SSL policy or is a custom ELB SSL policy."
@@ -55,7 +55,7 @@ end
 
 coreo_aws_rule "elb-current-ssl-policy" do
   action :define
-  service :elb
+  service :ElasticLoadBalancing
   link "http://kb.cloudcoreo.com/mydoc_elb-current-ssl-policy.html"
   include_violations_in_count false
   display_name "ELB is using current SSL policy"
