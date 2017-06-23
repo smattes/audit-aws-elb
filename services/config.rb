@@ -85,7 +85,7 @@ end
 
 coreo_aws_rule_runner "advise-elb" do
   rules ${AUDIT_AWS_ELB_ALERT_LIST}
-  service :elb
+  service :ElasticLoadBalancing
   action :run
   regions ${AUDIT_AWS_ELB_REGIONS}
   filter(${FILTERED_OBJECTS}) if ${FILTERED_OBJECTS}
