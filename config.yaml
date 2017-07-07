@@ -1,10 +1,9 @@
 variables:
-  AUDIT_AWS_EMAIL_TITLE:
+  HTML_REPORT_SUBJECT:
     required: false
     type: string
-    default: "Audit Summary"
-
-    description: "Enter the headline title"
+    default:
+    description: "Enter the headline title. Default is AUDIT SUMMARY"
   AUDIT_AWS_ELB_ALERT_LIST:
     required: false
     type: array
