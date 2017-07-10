@@ -107,14 +107,13 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.9.7-beta35"
+                   :version => "1.9.7-beta36"
                },
                {
                    :name => "js-yaml",
                    :version => "3.7.0"
                }       ])
-  json_input '{ "htmlReportSubject":"PLAN::name",
-                "compositeName":"PLAN::stack_name",
+  json_input '{ "compositeName":"PLAN::stack_name",
                 "planName":"PLAN::name",
                 "cloudAccountName": "PLAN::cloud_account_name",
                 "violations": COMPOSITE::coreo_aws_rule_runner.advise-elb.report}'
@@ -129,7 +128,7 @@ const NO_OWNER_EMAIL = "${AUDIT_AWS_ELB_ALERT_RECIPIENT}";
 const OWNER_TAG = "${AUDIT_AWS_ELB_OWNER_TAG}";
 const ALLOW_EMPTY = "${AUDIT_AWS_ELB_ALLOW_EMPTY}";
 const SEND_ON = "${AUDIT_AWS_ELB_SEND_ON}";
-const htmlReportSubject = "${HTML_REPORT_SUBJECT}" || json_input.htmlReportSubject;
+const htmlReportSubject = "${HTML_REPORT_SUBJECT}";
 
 const alertListArray = ${AUDIT_AWS_ELB_ALERT_LIST};
 const ruleInputs = {};

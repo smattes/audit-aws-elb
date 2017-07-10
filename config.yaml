@@ -3,7 +3,7 @@ variables:
     required: false
     type: string
     default:
-    description: "Enter the headline title. Default is AUDIT SUMMARY"
+    description: "Enter the headline title."
   AUDIT_AWS_ELB_ALERT_LIST:
     required: false
     type: array
