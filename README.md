@@ -45,6 +45,9 @@ This composite monitors elb against best practices and reports violations and in
 
 ## Optional variables with no default
 
+### `HTML_REPORT_SUBJECT`:
+  * description: Enter a custom report subject name.
+
 ### `AUDIT_AWS_ELB_ALERT_RECIPIENT`:
   * description: Enter the email address(es) that will receive notifiers. If more than one, separate each with a comma.
 
