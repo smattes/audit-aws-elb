@@ -205,6 +205,9 @@ coreo_uni_util_jsrunner "elb-tags-rollup" do
   data_type "text"
   json_input 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.return'
   function <<-EOH
+  console.log("I am here");
+  console.log(json_input);
+  console.log("#########");
 const notifiers = json_input;
 
 function setTextRollup() {
@@ -226,7 +229,7 @@ function setTextRollup() {
 let textRollup = '';
 setTextRollup();
 
-callback(textRollup);
+callback(notifiers);
   EOH
 end
 
