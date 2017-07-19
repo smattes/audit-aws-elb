@@ -107,7 +107,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.10.7-beta51"
+                   :version => "1.10.7-beta53"
                },
                {
                    :name => "js-yaml",
@@ -248,5 +248,3 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb rule results on PLAN::stack_name :: PLAN::name'
   })
 end
-
-
