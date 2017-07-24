@@ -107,7 +107,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.10.7-beta53"
+                   :version => "1.10.7-beta54"
                },
                {
                    :name => "js-yaml",
@@ -226,7 +226,7 @@ function setTextRollup() {
 let textRollup = '';
 setTextRollup();
 
-callback(notifiers);
+callback(textRollup);
   EOH
 end
 
@@ -243,7 +243,7 @@ coreo_uni_util_notify "advise-elb-rollup" do
   payload '
 COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
   '
-  payload_type 'html'
+  payload_type 'text'
   endpoint ({
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo elb rule results on PLAN::stack_name :: PLAN::name'
   })
