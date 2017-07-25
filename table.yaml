@@ -1,4 +1,4 @@
-elb-inventory:
+elb-inventory:{}
   "Load Balancer": "__OBJECT__~https://console.aws.amazon.com/ec2/v2/home?region=+__OBJECT__.violations.__RULE__.region+#LoadBalancers:search=__OBJECT__"
   "VPC": "+__OBJECT__.violations.__RULE__.result_info.0.object.vpc_id+"
   "Security Group": "+__OBJECT__.violations.__RULE__.result_info.0.object.source_security_group.group_name+"
