@@ -115,7 +115,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
                }       ])
   json_input '{ "compositeName":"PLAN::stack_name",
                 "planName":"PLAN::name",
-                "teamName":"PLAN::teamName",
+                "teamName":"PLAN::team_name",
                 "cloudAccountName": "PLAN::cloud_account_name",
                 "violations": COMPOSITE::coreo_aws_rule_runner.advise-elb.report}'
   function <<-EOH
