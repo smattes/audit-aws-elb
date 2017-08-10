@@ -280,3 +280,46 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo full rollup report for elb rule results on PLAN::stack_name :: PLAN::name'
   })
 end
+
+coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-1-policy" do
+  action :create
+  policy_document <<-EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+{
+"Sid": "",
+"Effect": "Allow",
+"Principal":
+{ "AWS": "*" }
+,
+"Action": "s3:*",
+"Resource": [
+"arn:aws:s3:::cloudcoreo-audit-aws-elb-1/*",
+"arn:aws:s3:::cloudcoreo-audit-aws-elb-1"
+]
+}
+]
+}
+  EOF
+end
+
+coreo_aws_s3_bucket "cloudcoreo-audit-aws-elb-1" do
+  action :create
+  bucket_policies ["cloudcoreo-audit-aws-elb-1-policy"]
+  region "us-east-1"
+end
+
+coreo_uni_util_notify "cloudcoreo-audit-aws-elb-1-s3" do
+  action :notify
+  type 's3'
+  allow_empty true
+  payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
+  endpoint ({
+      object_name: 'audit-aws-elb-json-report',
+      bucket_name: 'cloudcoreo-audit-aws-elb-1',
+      folder: 'elb/PLAN::name',
+      properties: {}
+  })
+end
+
