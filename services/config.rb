@@ -281,7 +281,7 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
   })
 end
 
-coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-1-policy" do
+coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
   action :create
   policy_document <<-EOF
 {
@@ -295,8 +295,8 @@ coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-1-policy" do
 ,
 "Action": "s3:*",
 "Resource": [
-"arn:aws:s3:::cloudcoreo-audit-aws-elb-1/*",
-"arn:aws:s3:::cloudcoreo-audit-aws-elb-1"
+"arn:aws:s3:::cloudcoreo-audit-aws-elb/*",
+"arn:aws:s3:::cloudcoreo-audit-aws-elb"
 ]
 }
 ]
@@ -304,20 +304,20 @@ coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-1-policy" do
   EOF
 end
 
-coreo_aws_s3_bucket "cloudcoreo-audit-aws-elb-1" do
+coreo_aws_s3_bucket "cloudcoreo-audit-aws-elb" do
   action :create
-  bucket_policies ["cloudcoreo-audit-aws-elb-1-policy"]
+  bucket_policies ["cloudcoreo-audit-aws-elb-policy"]
   region "us-east-1"
 end
 
-coreo_uni_util_notify "cloudcoreo-audit-aws-elb-1-s3" do
+coreo_uni_util_notify "cloudcoreo-audit-aws-elb-s3" do
   action :notify
   type 's3'
   allow_empty true
   payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
   endpoint ({
       object_name: 'audit-aws-elb-json-report',
-      bucket_name: 'cloudcoreo-audit-aws-elb-1',
+      bucket_name: 'cloudcoreo-audit-aws-elb',
       folder: 'elb/PLAN::name',
       properties: {}
   })
