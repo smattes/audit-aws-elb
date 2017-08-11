@@ -311,12 +311,12 @@ coreo_aws_s3_bucket "cloudcoreo-audit-aws-elb" do
 end
 
 coreo_uni_util_notify "cloudcoreo-audit-aws-elb-s3" do
-  action :notify
+  action((("${S3_BUCKET_NAME}".length > 0) ) ? :notify : :nothing)
   type 's3'
   allow_empty true
   payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
   endpoint ({
-      object_name: 'audit-aws-elb-json-report',
+      object_name: 'aws-elb-json',
       bucket_name: 'cloudcoreo-audit-aws-elb',
       folder: 'elb/PLAN::name',
       properties: {}
