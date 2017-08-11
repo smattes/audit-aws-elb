@@ -282,7 +282,7 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
 end
 
 coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
-  action :create
+  action((("${S3_BUCKET_NAME}".length > 0) ) ? :create : :nothing)
   policy_document <<-EOF
 {
 "Version": "2012-10-17",
@@ -295,8 +295,8 @@ coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
 ,
 "Action": "s3:*",
 "Resource": [
-"arn:aws:s3:::cloudcoreo-audit-aws-elb/*",
-"arn:aws:s3:::cloudcoreo-audit-aws-elb"
+"arn:aws:s3:::${S3_BUCKET_NAME}/*",
+"arn:aws:s3:::${S3_BUCKET_NAME}"
 ]
 }
 ]
