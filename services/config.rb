@@ -10,7 +10,7 @@ coreo_aws_rule "elb-inventory" do
   suggested_action "None."
   level "Informational"
   objectives ["load_balancers"]
-  audit_objects ["load_balancer_descriptions.load_balancer_name"]
+  audit_objects ["object.load_balancer_descriptions.load_balancer_name"]
   operators ["=~"]
   raise_when [//]
   id_map "object.load_balancer_descriptions.load_balancer_name"
@@ -27,7 +27,7 @@ coreo_aws_rule "elb-load-balancers-active-security-groups-list" do
   suggested_action "Ignore"
   level "Internal"
   objectives ["load_balancers"]
-  audit_objects ["load_balancer_descriptions.security_groups"]
+  audit_objects ["object.load_balancer_descriptions.security_groups"]
   operators ["=~"]
   raise_when [//]
   id_map "object.load_balancer_descriptions.load_balancer_name"
@@ -45,7 +45,7 @@ coreo_aws_rule "elb-old-ssl-policy" do
   meta_nist_171_id "3.5.4"
   id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
-  audit_objects  ["", "policy_descriptions"]
+  audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
@@ -65,7 +65,7 @@ coreo_aws_rule "elb-current-ssl-policy" do
   level "Informational"
   id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
-  audit_objects  ["", "policy_descriptions"]
+  audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "=~"]
@@ -107,7 +107,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.10.7-beta63"
+                   :version => "1.10.7-beta64"
                },
                {
                    :name => "js-yaml",
@@ -280,3 +280,46 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
       :to => '${AUDIT_AWS_ELB_ALERT_RECIPIENT}', :subject => 'CloudCoreo full rollup report for elb rule results on PLAN::stack_name :: PLAN::name'
   })
 end
+
+coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
+  action((("${S3_BUCKET_NAME}".length > 0) ) ? :create : :nothing)
+  policy_document <<-EOF
+{
+"Version": "2012-10-17",
+"Statement": [
+{
+"Sid": "",
+"Effect": "Allow",
+"Principal":
+{ "AWS": "*" }
+,
+"Action": "s3:*",
+"Resource": [
+"arn:aws:s3:::${S3_BUCKET_NAME}/*",
+"arn:aws:s3:::${S3_BUCKET_NAME}"
+]
+}
+]
+}
+  EOF
+end
+
+coreo_aws_s3_bucket "cloudcoreo-audit-aws-elb" do
+  action :create
+  bucket_policies ["cloudcoreo-audit-aws-elb-policy"]
+  region "us-east-1"
+end
+
+coreo_uni_util_notify "cloudcoreo-audit-aws-elb-s3" do
+  action((("${S3_BUCKET_NAME}".length > 0) ) ? :notify : :nothing)
+  type 's3'
+  allow_empty true
+  payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
+  endpoint ({
+      object_name: 'aws-elb-json',
+      bucket_name: '${S3_BUCKET_NAME}',
+      folder: 'elb/PLAN::name',
+      properties: {}
+  })
+end
+
