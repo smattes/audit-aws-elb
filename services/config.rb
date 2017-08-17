@@ -10,7 +10,7 @@ coreo_aws_rule "elb-inventory" do
   suggested_action "None."
   level "Informational"
   objectives ["load_balancers"]
-  audit_objects ["load_balancer_descriptions.load_balancer_name"]
+  audit_objects ["object.load_balancer_descriptions.load_balancer_name"]
   operators ["=~"]
   raise_when [//]
   id_map "object.load_balancer_descriptions.load_balancer_name"
@@ -27,7 +27,7 @@ coreo_aws_rule "elb-load-balancers-active-security-groups-list" do
   suggested_action "Ignore"
   level "Internal"
   objectives ["load_balancers"]
-  audit_objects ["load_balancer_descriptions.security_groups"]
+  audit_objects ["object.load_balancer_descriptions.security_groups"]
   operators ["=~"]
   raise_when [//]
   id_map "object.load_balancer_descriptions.load_balancer_name"
@@ -45,7 +45,7 @@ coreo_aws_rule "elb-old-ssl-policy" do
   meta_nist_171_id "3.5.4"
   id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
-  audit_objects  ["", "policy_descriptions"]
+  audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "!~"]
@@ -65,7 +65,7 @@ coreo_aws_rule "elb-current-ssl-policy" do
   level "Informational"
   id_map "modifiers.load_balancer_name"
   objectives     ["load_balancers", "load_balancer_policies" ]
-  audit_objects  ["", "policy_descriptions"]
+  audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
   operators      ["", "=~"]
