@@ -72,6 +72,10 @@ coreo_aws_rule "elb-current-ssl-policy" do
   raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "modifiers.load_balancer_name"
 end
+git checkout -b CON-200-audit-objects-must-be-prefixed-with-object-var
+git add .
+git commit -m "CON-200 prefixed 'object' to audit_objects"
+git push origin CON-200-audit-objects-must-be-prefixed-with-object-var
 
 coreo_uni_util_variables "elb-planwide" do
   action :set
@@ -282,7 +286,7 @@ COMPOSITE::coreo_uni_util_jsrunner.elb-tags-rollup.return
 end
 
 coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
-  action((("${S3_BUCKET_NAME}".length > 0) ) ? :create : :nothing)
+  action((("${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}".length > 0) ) ? :create : :nothing)
   policy_document <<-EOF
 {
 "Version": "2012-10-17",
@@ -295,8 +299,8 @@ coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
 ,
 "Action": "s3:*",
 "Resource": [
-"arn:aws:s3:::${S3_BUCKET_NAME}/*",
-"arn:aws:s3:::${S3_BUCKET_NAME}"
+"arn:aws:s3:::${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}/*",
+"arn:aws:s3:::${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}"
 ]
 }
 ]
@@ -305,21 +309,20 @@ coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
 end
 
 coreo_aws_s3_bucket "cloudcoreo-audit-aws-elb" do
-  action :create
+  action((("${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}".length > 0) ) ? :create : :nothing)
   bucket_policies ["cloudcoreo-audit-aws-elb-policy"]
   region "us-east-1"
 end
 
 coreo_uni_util_notify "cloudcoreo-audit-aws-elb-s3" do
-  action((("${S3_BUCKET_NAME}".length > 0) ) ? :notify : :nothing)
+  action((("${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}".length > 0) ) ? :notify : :nothing)
   type 's3'
   allow_empty true
   payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
   endpoint ({
       object_name: 'aws-elb-json',
-      bucket_name: '${S3_BUCKET_NAME}',
+      bucket_name: '${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}',
       folder: 'elb/PLAN::name',
       properties: {}
   })
 end
-
