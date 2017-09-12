@@ -17,6 +17,8 @@ variables:
     required: false
     type: string
     default:
+    validation:
+        - email-recipient
   AUDIT_AWS_ELB_OWNER_TAG:
     description: "Enter an AWS tag whose value is an email address of owner of the ELB object. (Optional)"
     required: false
@@ -61,4 +63,6 @@ variables:
     type: string
     default:
     description: "Enter S3 bucket name to upload reports. (Optional)"
-    validation: true
+    validation:
+      - s3-bucket-name
+      - email
