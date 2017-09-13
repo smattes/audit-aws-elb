@@ -320,7 +320,7 @@ coreo_uni_util_notify "cloudcoreo-audit-aws-elb-s3" do
   payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
   endpoint ({
       object_name: 'aws-elb-json',
-      bucket_name: '${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}',
+      bucket_name: 'bucket-${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}',
       folder: 'elb/PLAN::name',
       properties: {}
   })
