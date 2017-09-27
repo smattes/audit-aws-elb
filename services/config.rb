@@ -72,10 +72,6 @@ coreo_aws_rule "elb-current-ssl-policy" do
   raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
   id_map "modifiers.load_balancer_name"
 end
-git checkout -b CON-200-audit-objects-must-be-prefixed-with-object-var
-git add .
-git commit -m "CON-200 prefixed 'object' to audit_objects"
-git push origin CON-200-audit-objects-must-be-prefixed-with-object-var
 
 coreo_uni_util_variables "elb-planwide" do
   action :set
