@@ -48,8 +48,8 @@ coreo_aws_rule "elb-old-ssl-policy" do
   audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
-  operators      ["", "!~"]
-  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  operators      ["", "=~"]
+  raise_when     ["", /ELBSecurityPolicy-(?!2016-08)/]
   id_map "modifiers.load_balancer_name"
 end
 
