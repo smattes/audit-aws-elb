@@ -13,5 +13,5 @@ elb-old-ssl-policy:
 #  "AWS Region": "+__OBJECT__.violations.__RULE__.region+"
 #  "AWS Tags": "__TAGS__"
 default:
-  "Object ID": "+__OBJECT__+"
+  "Object ID": "__OBJECT__"
   "Region": "+__OBJECT__.violations.__RULE__.region+"
