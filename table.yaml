@@ -8,10 +8,10 @@ elb-old-ssl-policy:
   "Load Balancer": "__OBJECT__~https://console.aws.amazon.com/ec2/v2/home?region=+__OBJECT__.violations.__RULE__.region+#LoadBalancers:search=__OBJECT__"
   "AWS Region": "+__OBJECT__.violations.__RULE__.region+"
   "AWS Tags": "__TAGS__"
-elb-current-ssl-policy:
-  "Load Balancer": "__OBJECT__~https://console.aws.amazon.com/ec2/v2/home?region=+__OBJECT__.violations.__RULE__.region+#LoadBalancers:search=__OBJECT__"
-  "AWS Region": "+__OBJECT__.violations.__RULE__.region+"
-  "AWS Tags": "__TAGS__"
+#elb-current-ssl-policy:
+#  "Load Balancer": "__OBJECT__~https://console.aws.amazon.com/ec2/v2/home?region=+__OBJECT__.violations.__RULE__.region+#LoadBalancers:search=__OBJECT__"
+#  "AWS Region": "+__OBJECT__.violations.__RULE__.region+"
+#  "AWS Tags": "__TAGS__"
 default:
   "Object ID": "+__OBJECT__+"
   "Region": "+__OBJECT__.violations.__RULE__.region+"
