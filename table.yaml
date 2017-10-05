@@ -8,5 +8,5 @@ default:
   "object-default1": "__OBJECT__"
   "object-default2": "__OBJECT__"
   "object-default3": "__OBJECT__"
-  "object-region4": "__OBJECT__.violations.__RULE__.region+"
+  "object-region4": "+__OBJECT__.violations.__RULE__.region+"
   "AWS Tags": "__TAGS__"
