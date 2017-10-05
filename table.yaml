@@ -4,6 +4,6 @@ elb-inventory:
   "Security Group": "+__OBJECT__.violations.__RULE__.result_info.0.object.source_security_group.group_name+"
   "AWS Region": "+__OBJECT__.violations.__RULE__.region+"
   "AWS Tags": "__TAGS__"
-default:
-  "Object ID": "+__OBJECT__+"
-  "Region": "+__OBJECT__.violations.__RULE__.region+"
+#default:
+#  "Object ID": "+__OBJECT__+"
+#  "Region": "+__OBJECT__.violations.__RULE__.region+"
