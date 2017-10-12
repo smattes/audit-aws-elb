@@ -48,8 +48,8 @@ coreo_aws_rule "elb-old-ssl-policy" do
   audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
-  operators      ["", "!~"]
-  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  operators      ["", "=~"]
+  raise_when     ["", /ELBSecurityPolicy-(?!2016-08)/]
   id_map "modifiers.load_balancer_name"
 end
 
@@ -63,13 +63,12 @@ coreo_aws_rule "elb-current-ssl-policy" do
   category "Informational"
   suggested_action "None."
   level "Informational"
-  id_map "modifiers.load_balancer_name"
-  objectives     ["load_balancers", "load_balancer_policies" ]
-  audit_objects  ["", "object.policy_descriptions"]
-  call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
-  formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
-  operators      ["", "=~"]
-  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  objectives     ["load_balancers", "load_balancer_policies", "load_balancers", "load_balancer_policies"]
+  audit_objects  ["", "object.policy_descriptions", "", "object.policy_descriptions"]
+  call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}, {}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
+  formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value", "", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
+  operators      ["", "=~", "", "!~"]
+  raise_when     ["", /ELBSecurityPolicy-2016-08/, "", /ELBSecurityPolicy-(?!2016-08)/]
   id_map "modifiers.load_balancer_name"
 end
 
