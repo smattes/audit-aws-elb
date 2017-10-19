@@ -61,3 +61,5 @@ variables:
     type: string
     default:
     description: "Enter S3 bucket name to upload reports. (Optional)"
+    validations:
+      - s3-bucket-name-validation

@@ -48,8 +48,8 @@ coreo_aws_rule "elb-old-ssl-policy" do
   audit_objects  ["", "object.policy_descriptions"]
   call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
   formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
-  operators      ["", "!~"]
-  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  operators      ["", "=~"]
+  raise_when     ["", /ELBSecurityPolicy-(?!2016-08)/]
   id_map "modifiers.load_balancer_name"
 end
 
@@ -63,19 +63,14 @@ coreo_aws_rule "elb-current-ssl-policy" do
   category "Informational"
   suggested_action "None."
   level "Informational"
-  id_map "modifiers.load_balancer_name"
-  objectives     ["load_balancers", "load_balancer_policies" ]
-  audit_objects  ["", "object.policy_descriptions"]
-  call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
-  formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
-  operators      ["", "=~"]
-  raise_when     ["", /\[\"?(?:ELBSecurityPolicy-2016-08)?\"?\]/]
+  objectives     ["load_balancers", "load_balancer_policies", "load_balancers", "load_balancer_policies"]
+  audit_objects  ["", "object.policy_descriptions", "", "object.policy_descriptions"]
+  call_modifiers [{}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}, {}, {:load_balancer_name => "load_balancer_descriptions.load_balancer_name"}]
+  formulas       ["", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value", "", "jmespath.[].policy_attribute_descriptions[?attribute_name == 'Reference-Security-Policy'].attribute_value"]
+  operators      ["", "=~", "", "!~"]
+  raise_when     ["", /ELBSecurityPolicy-2016-08/, "", /ELBSecurityPolicy-(?!2016-08)/]
   id_map "modifiers.load_balancer_name"
 end
-git checkout -b CON-200-audit-objects-must-be-prefixed-with-object-var
-git add .
-git commit -m "CON-200 prefixed 'object' to audit_objects"
-git push origin CON-200-audit-objects-must-be-prefixed-with-object-var
 
 coreo_uni_util_variables "elb-planwide" do
   action :set
@@ -111,7 +106,7 @@ coreo_uni_util_jsrunner "elb-tags-to-notifiers-array" do
   packages([
                {
                    :name => "cloudcoreo-jsrunner-commons",
-                   :version => "1.10.7-beta64"
+                   :version => "1.10.7-beta65"
                },
                {
                    :name => "js-yaml",
@@ -299,8 +294,8 @@ coreo_aws_s3_policy "cloudcoreo-audit-aws-elb-policy" do
 ,
 "Action": "s3:*",
 "Resource": [
-"arn:aws:s3:::${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}/*",
-"arn:aws:s3:::${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}"
+"arn:aws:s3:::bucket-${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}/*",
+"arn:aws:s3:::bucket-${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}"
 ]
 }
 ]
@@ -320,7 +315,7 @@ coreo_uni_util_notify "cloudcoreo-audit-aws-elb-s3" do
   payload 'COMPOSITE::coreo_uni_util_jsrunner.elb-tags-to-notifiers-array.report'
   endpoint ({
       object_name: 'aws-elb-json',
-      bucket_name: '${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}',
+      bucket_name: 'bucket-${AUDIT_AWS_ELB_S3_NOTIFICATION_BUCKET_NAME}',
       folder: 'elb/PLAN::name',
       properties: {}
   })
